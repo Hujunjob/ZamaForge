@@ -49,7 +49,8 @@
     "convert": "Convertir",
     "transfer": "Transférer",
     "erc20Badge": "ERC20",
-    "encryptedBadge": "Chiffré"
+    "encryptedBadge": "Chiffré",
+    "encryptedSuffix": " (Chiffré)"
   },
   "createToken": {
     "title": "Créer un Jeton",

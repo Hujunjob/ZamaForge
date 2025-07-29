@@ -115,8 +115,8 @@ const Index = () => {
         } else {
           // 创建新的加密代币，使用真实的合约地址
           addToken({
-            name: sourceToken.name,
-            symbol: sourceToken.symbol,
+            name: `${sourceToken.name}${t('tokenCard.encryptedSuffix')}`,
+            symbol: `c${sourceToken.symbol}`,
             balance: amount,
             type: toType,
             contractAddress: confidentialTokenAddress,
@@ -190,8 +190,8 @@ const Index = () => {
         } else {
           // 创建新的ERC20代币记录
           addToken({
-            name: sourceToken.name.replace(" (加密)", ""), // 移除加密标识
-            symbol: sourceToken.symbol.replace("c", ""), // 移除加密前缀
+            name: sourceToken.name.replace(t('tokenCard.encryptedSuffix'), ""), // 移除加密标识
+            symbol: sourceToken.symbol.startsWith("c") ? sourceToken.symbol.slice(1) : sourceToken.symbol, // 移除加密前缀
             balance: amount,
             type: toType,
             contractAddress: erc20TokenAddress,

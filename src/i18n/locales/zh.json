@@ -49,7 +49,8 @@
     "convert": "转换",
     "transfer": "转账",
     "erc20Badge": "ERC20",
-    "encryptedBadge": "加密"
+    "encryptedBadge": "加密",
+    "encryptedSuffix": " (加密)"
   },
   "createToken": {
     "title": "创建代币",

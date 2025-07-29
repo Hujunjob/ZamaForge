@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useZamaForge } from './useZamaForge';
 import { useConfidentialTokenFactory } from './useConfidentialTokenFactory';
+import i18n from '@/i18n/config';
 
 export interface Token {
   id: string;
@@ -71,7 +72,7 @@ export const useTokens = () => {
       if (confidentialTokenAddress && confidentialTokenAddress !== '0x0000000000000000000000000000000000000000') {
         const confidentialZamaForgeToken: Token = {
           id: `confidential_zamaforge_${confidentialTokenAddress}`,
-          name: `${zamaForgeInfo.name} (加密)`,
+          name: `${zamaForgeInfo.name}${i18n.t('tokenCard.encryptedSuffix')}`,
           symbol: `c${zamaForgeInfo.symbol}`,
           balance: 0, // We don't have the balance yet, would need to decrypt
           type: 'encrypted',
