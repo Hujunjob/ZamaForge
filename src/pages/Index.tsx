@@ -10,45 +10,96 @@ import { Header } from "@/components/Header";
 import { Shield, Coins, ArrowLeftRight, Sparkles, Zap, Lock, Trash2 } from "lucide-react";
 import { useTokens, Token } from "@/hooks/useTokens";
 import { useToast } from "@/hooks/use-toast";
+import { useConfidentialTokenFactory } from "@/hooks/useConfidentialTokenFactory";
 import heroImage from "@/assets/hero-blockchain.jpg";
 
 const Index = () => {
-  const { tokens, updateToken, clearAllTokens, erc20Tokens, encryptedTokens } = useTokens();
+  const { tokens, addToken, updateToken, clearAllTokens, erc20Tokens, encryptedTokens } = useTokens();
   const { toast } = useToast();
+  const { wrapERC20, isPending: isWrapping, isConfirmed, error: wrapError } = useConfidentialTokenFactory();
 
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
 
-  const handleConvertToken = (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => {
+  const handleConvertToken = async (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => {
     const sourceToken = tokens.find(t => t.id === tokenId);
-    if (!sourceToken || sourceToken.balance < amount) return;
-
-    // 减少源代币余额
-    updateToken(tokenId, { balance: sourceToken.balance - amount });
-
-    // 查找是否已存在目标类型的同名代币
-    const existingTargetToken = tokens.find(t => 
-      t.name === sourceToken.name && 
-      t.symbol === sourceToken.symbol && 
-      t.type === toType
-    );
-
-    if (existingTargetToken) {
-      // 增加现有目标代币余额
-      updateToken(existingTargetToken.id, { 
-        balance: existingTargetToken.balance + amount 
+    if (!sourceToken || sourceToken.balance < amount) {
+      toast({
+        title: "错误",
+        description: "代币余额不足",
+        variant: "destructive"
       });
-    } else {
-      // 创建新的目标类型代币
-      addToken({
-        name: sourceToken.name,
-        symbol: sourceToken.symbol,
-        balance: amount,
-        type: toType,
-        contractAddress: `0x${Math.random().toString(16).slice(2, 42)}`,
-        isBalanceEncrypted: toType === 'encrypted'
+      return;
+    }
+
+    try {
+      if (sourceToken.type === 'erc20' && toType === 'encrypted') {
+        // ERC20 转换为加密代币：调用 wrapERC20
+        if (!sourceToken.contractAddress) {
+          toast({
+            title: "错误", 
+            description: "缺少合约地址",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        toast({
+          title: "正在转换",
+          description: "正在将ERC20代币转换为加密代币，请确认交易..."
+        });
+
+        await wrapERC20(sourceToken.contractAddress, amount);
+        
+        toast({
+          title: "转换成功",
+          description: `已将 ${amount} ${sourceToken.symbol} 转换为加密代币`
+        });
+
+      } else if (sourceToken.type === 'encrypted' && toType === 'erc20') {
+        // 加密代币转换为ERC20：调用 unwrap (需要实现)
+        toast({
+          title: "功能开发中",
+          description: "加密代币转换为ERC20功能正在开发中",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // 更新本地状态（这里应该监听合约事件来更新，暂时保留简单实现）
+      updateToken(tokenId, { balance: sourceToken.balance - amount });
+
+      // 查找是否已存在目标类型的同名代币
+      const existingTargetToken = tokens.find(t => 
+        t.name === sourceToken.name && 
+        t.symbol === sourceToken.symbol && 
+        t.type === toType
+      );
+
+      if (existingTargetToken) {
+        updateToken(existingTargetToken.id, { 
+          balance: existingTargetToken.balance + amount 
+        });
+      } else {
+        // 创建新的目标类型代币
+        addToken({
+          name: sourceToken.name,
+          symbol: sourceToken.symbol,
+          balance: amount,
+          type: toType,
+          contractAddress: toType === 'encrypted' ? `0x${Math.random().toString(16).slice(2, 42)}` : sourceToken.contractAddress,
+          isBalanceEncrypted: toType === 'encrypted'
+        });
+      }
+
+    } catch (error) {
+      console.error('转换失败:', error);
+      toast({
+        title: "转换失败",
+        description: error instanceof Error ? error.message : "未知错误",
+        variant: "destructive"
       });
     }
   };
@@ -302,6 +353,7 @@ const Index = () => {
         onOpenChange={setConvertDialogOpen}
         token={selectedToken}
         onConvert={handleConvertToken}
+        isLoading={isWrapping}
       />
       
       <TransferDialog

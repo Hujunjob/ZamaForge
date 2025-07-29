@@ -11,18 +11,20 @@ interface ConvertDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   token: Token | null;
-  onConvert: (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => void;
+  onConvert: (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => Promise<void>;
+  isLoading?: boolean;
 }
 
-export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertDialogProps) => {
+export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading = false }: ConvertDialogProps) => {
   const [amount, setAmount] = useState("");
+  const [isConverting, setIsConverting] = useState(false);
   const { toast } = useToast();
 
   if (!token) return null;
 
   const targetType = token.type === 'erc20' ? 'encrypted' : 'erc20';
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     const convertAmount = parseFloat(amount);
     
     if (!convertAmount || convertAmount <= 0) {
@@ -43,15 +45,17 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertD
       return;
     }
 
-    onConvert(token.id, convertAmount, targetType);
+    setIsConverting(true);
     
-    toast({
-      title: "转换成功",
-      description: `已将 ${convertAmount} ${token.symbol} 转换为${targetType === 'encrypted' ? '加密代币' : 'ERC20代币'}`,
-    });
-
-    setAmount("");
-    onOpenChange(false);
+    try {
+      await onConvert(token.id, convertAmount, targetType);
+      setAmount("");
+      onOpenChange(false);
+    } catch (error) {
+      // 错误处理已在父组件中完成
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   return (
@@ -123,8 +127,9 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertD
               onClick={handleConvert} 
               variant="glow" 
               className="flex-1"
+              disabled={isConverting || isLoading}
             >
-              确认转换
+              {isConverting || isLoading ? "转换中..." : "确认转换"}
             </Button>
           </div>
         </div>

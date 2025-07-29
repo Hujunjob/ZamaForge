@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useZamaForge } from './useZamaForge';
+import { useConfidentialTokenFactory } from './useConfidentialTokenFactory';
 
 export interface Token {
   id: string;
@@ -17,6 +18,7 @@ const STORAGE_KEY = 'zamaforge_tokens';
 export const useTokens = () => {
   const { address } = useAccount();
   const { zamaForgeInfo, isLoading: zamaForgeLoading } = useZamaForge();
+  const { confidentialTokenAddress } = useConfidentialTokenFactory();
   const [tokens, setTokens] = useState<Token[]>([]);
 
   // Load tokens from localStorage on component mount and include ZamaForge token
@@ -62,18 +64,49 @@ export const useTokens = () => {
         // Add ZamaForge token at the beginning
         loadedTokens.unshift(zamaForgeToken);
       }
+
+      // Also include the corresponding confidential token if available
+      if (confidentialTokenAddress && confidentialTokenAddress !== '0x0000000000000000000000000000000000000000') {
+        const confidentialZamaForgeToken: Token = {
+          id: `confidential_zamaforge_${confidentialTokenAddress}`,
+          name: `${zamaForgeInfo.name} (加密)`,
+          symbol: `c${zamaForgeInfo.symbol}`,
+          balance: 0, // We don't have the balance yet, would need to decrypt
+          type: 'encrypted',
+          contractAddress: confidentialTokenAddress as string,
+          isBalanceEncrypted: true,
+        };
+
+        // Check if confidential ZamaForge token already exists
+        const existingConfidentialIndex = loadedTokens.findIndex(
+          token => token.contractAddress === confidentialTokenAddress
+        );
+
+        if (existingConfidentialIndex >= 0) {
+          // Update existing confidential token
+          loadedTokens[existingConfidentialIndex] = confidentialZamaForgeToken;
+        } else {
+          // Add confidential token after the ERC20 token
+          const zamaForgeIndex = loadedTokens.findIndex(token => token.id.startsWith('zamaforge_'));
+          if (zamaForgeIndex >= 0) {
+            loadedTokens.splice(zamaForgeIndex + 1, 0, confidentialZamaForgeToken);
+          } else {
+            loadedTokens.unshift(confidentialZamaForgeToken);
+          }
+        }
+      }
     }
 
     setTokens(loadedTokens);
-  }, [address, zamaForgeInfo?.contractAddress, zamaForgeInfo?.name, zamaForgeInfo?.symbol, zamaForgeInfo?.balance, zamaForgeLoading]);
+  }, [address, zamaForgeInfo?.contractAddress, zamaForgeInfo?.name, zamaForgeInfo?.symbol, zamaForgeInfo?.balance, zamaForgeLoading, confidentialTokenAddress]);
 
   // Save tokens to localStorage whenever tokens change (exclude ZamaForge token)
   useEffect(() => {
     if (address && tokens.length > 0) {
       const storageKey = `${STORAGE_KEY}_${address}`;
-      // Filter out ZamaForge token before saving to cache
+      // Filter out ZamaForge tokens (both ERC20 and confidential) before saving to cache
       const tokensToCache = tokens.filter(
-        token => !token.id.startsWith('zamaforge_')
+        token => !token.id.startsWith('zamaforge_') && !token.id.startsWith('confidential_zamaforge_')
       );
       if (tokensToCache.length > 0) {
         localStorage.setItem(storageKey, JSON.stringify(tokensToCache));
@@ -84,8 +117,9 @@ export const useTokens = () => {
   const addToken = (token: Omit<Token, 'id'>) => {
     // Prevent adding duplicate ZamaForge tokens
     const ZAMAFORGE_CONTRACT_ADDRESS = '0xdc5A3601541518A3B52879ef5F231f6A624C93EB';
-    if (token.contractAddress === ZAMAFORGE_CONTRACT_ADDRESS) {
-      return; // ZamaForge token is automatically added
+    if (token.contractAddress === ZAMAFORGE_CONTRACT_ADDRESS || 
+        (confidentialTokenAddress && token.contractAddress === confidentialTokenAddress)) {
+      return; // ZamaForge tokens are automatically added
     }
 
     const newToken: Token = {
