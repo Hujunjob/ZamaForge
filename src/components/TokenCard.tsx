@@ -1,23 +1,41 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, Coins, Shield } from "lucide-react";
-
-interface Token {
-  id: string;
-  name: string;
-  symbol: string;
-  balance: number;
-  type: 'erc20' | 'encrypted';
-  contractAddress?: string;
-}
+import { ArrowLeftRight, Coins, Shield, Eye, EyeOff, Copy, Send } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Token } from "@/hooks/useTokens";
 
 interface TokenCardProps {
   token: Token;
   onConvert: (token: Token) => void;
+  onTransfer?: (token: Token) => void;
 }
 
-export const TokenCard = ({ token, onConvert }: TokenCardProps) => {
+export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
+  const [isBalanceVisible, setIsBalanceVisible] = useState(!token.isBalanceEncrypted);
+  const { toast } = useToast();
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "已复制",
+        description: "合约地址已复制到剪贴板",
+      });
+    } catch (error) {
+      toast({
+        title: "复制失败",
+        description: "无法复制到剪贴板",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleBalanceVisibility = () => {
+    setIsBalanceVisible(!isBalanceVisible);
+  };
+
   return (
     <Card className="group hover:shadow-neon hover:-translate-y-2 hover:scale-105 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5"></div>
@@ -60,29 +78,76 @@ export const TokenCard = ({ token, onConvert }: TokenCardProps) => {
       <CardContent className="space-y-6 relative z-10">
         <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-primary/10">
           <span className="text-base text-foreground/70 font-medium">余额</span>
-          <span className="text-2xl font-black text-foreground bg-gradient-primary bg-clip-text text-transparent">
-            {token.balance.toLocaleString()} {token.symbol}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-black text-foreground bg-gradient-primary bg-clip-text text-transparent">
+              {isBalanceVisible 
+                ? `${token.balance.toLocaleString()} ${token.symbol}`
+                : '••••••••'
+              }
+            </span>
+            {token.isBalanceEncrypted && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleBalanceVisibility}
+                className="h-8 w-8 p-0 hover:bg-primary/10"
+              >
+                {isBalanceVisible ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+          </div>
         </div>
+        
+        {token.isBalanceEncrypted && (
+          <div className="text-sm text-muted-foreground bg-primary/5 border border-primary/20 rounded-lg p-3">
+            <Shield className="h-4 w-4 inline mr-2" />
+            代币数量加密，其他任何人无法追踪数量
+          </div>
+        )}
         
         {token.contractAddress && (
           <div className="space-y-2">
             <span className="text-sm text-foreground/70 font-medium">合约地址</span>
-            <p className="text-xs text-foreground/60 font-mono bg-muted/50 px-3 py-2 rounded-lg border border-primary/10">
-              {token.contractAddress}
-            </p>
+            <div className="flex items-center gap-2 text-xs text-foreground/60 font-mono bg-muted/50 px-3 py-2 rounded-lg border border-primary/10">
+              <span className="flex-1">{token.contractAddress}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => copyToClipboard(token.contractAddress!)}
+                className="h-6 w-6 p-0 hover:bg-primary/10"
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
         )}
         
-        <Button 
-          onClick={() => onConvert(token)} 
-          variant="glow" 
-          size="default" 
-          className="w-full mt-6 h-12 text-base font-bold"
-        >
-          <ArrowLeftRight className="h-5 w-5 mr-2" />
-          转换代币
-        </Button>
+        <div className="flex gap-3 mt-6">
+          <Button 
+            onClick={() => onConvert(token)} 
+            variant="glow" 
+            size="default" 
+            className="flex-1 h-12 text-base font-bold"
+          >
+            <ArrowLeftRight className="h-5 w-5 mr-2" />
+            转换
+          </Button>
+          {onTransfer && (
+            <Button 
+              onClick={() => onTransfer(token)} 
+              variant="outline" 
+              size="default" 
+              className="flex-1 h-12 text-base font-bold border-primary/30 hover:bg-primary/10"
+            >
+              <Send className="h-5 w-5 mr-2" />
+              转账
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

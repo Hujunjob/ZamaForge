@@ -4,52 +4,61 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowUpDown, Shield, Coins } from "lucide-react";
+import { Send, Shield, Coins } from "lucide-react";
 import { Token } from "@/hooks/useTokens";
 
-interface ConvertDialogProps {
+interface TransferDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   token: Token | null;
-  onConvert: (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => void;
+  onTransfer: (tokenId: string, toAddress: string, amount: number) => void;
 }
 
-export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertDialogProps) => {
+export const TransferDialog = ({ open, onOpenChange, token, onTransfer }: TransferDialogProps) => {
+  const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
   const { toast } = useToast();
 
   if (!token) return null;
 
-  const targetType = token.type === 'erc20' ? 'encrypted' : 'erc20';
-
-  const handleConvert = () => {
-    const convertAmount = parseFloat(amount);
+  const handleTransfer = () => {
+    const transferAmount = parseFloat(amount);
     
-    if (!convertAmount || convertAmount <= 0) {
+    if (!toAddress || !toAddress.startsWith('0x') || toAddress.length !== 42) {
       toast({
         title: "错误",
-        description: "请输入有效的转换数量",
+        description: "请输入有效的以太坊地址",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!transferAmount || transferAmount <= 0) {
+      toast({
+        title: "错误",
+        description: "请输入有效的转账数量",
         variant: "destructive"
       });
       return;
     }
 
-    if (convertAmount > token.balance) {
+    if (transferAmount > token.balance) {
       toast({
         title: "错误", 
-        description: "转换数量不能超过余额",
+        description: "转账数量不能超过余额",
         variant: "destructive"
       });
       return;
     }
 
-    onConvert(token.id, convertAmount, targetType);
+    onTransfer(token.id, toAddress, transferAmount);
     
     toast({
-      title: "转换成功",
-      description: `已将 ${convertAmount} ${token.symbol} 转换为${targetType === 'encrypted' ? '加密代币' : 'ERC20代币'}`,
+      title: "转账成功",
+      description: `已向 ${toAddress.slice(0, 6)}...${toAddress.slice(-4)} 转账 ${transferAmount} ${token.symbol}`,
     });
 
+    setToAddress("");
     setAmount("");
     onOpenChange(false);
   };
@@ -59,11 +68,17 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertD
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <ArrowUpDown className="h-5 w-5" />
-            代币转换
+            <Send className="h-5 w-5" />
+            {token.type === 'encrypted' ? '私密转账' : 'ERC20转账'}
           </DialogTitle>
           <DialogDescription>
-            将 {token.name} 从 {token.type === 'erc20' ? 'ERC20代币' : '加密代币'} 转换为 {targetType === 'erc20' ? 'ERC20代币' : '加密代币'}
+            发送 {token.name} ({token.symbol}) 到指定地址
+            {token.type === 'encrypted' && (
+              <div className="mt-2 text-sm text-primary bg-primary/5 border border-primary/20 rounded p-2">
+                <Shield className="h-3 w-3 inline mr-1" />
+                加密代币转账，金额完全保密
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
         
@@ -76,34 +91,29 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertD
               }
               <div>
                 <p className="font-medium">{token.name}</p>
-                <p className="text-sm text-muted-foreground">当前余额: {token.balance.toLocaleString()} {token.symbol}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <ArrowUpDown className="h-8 w-8 text-primary animate-pulse" />
-          </div>
-
-          <div className="flex items-center justify-between p-4 rounded-lg bg-accent/10 border border-primary/20">
-            <div className="flex items-center gap-3">
-              {targetType === 'encrypted' ? 
-                <Shield className="h-5 w-5 text-primary" /> : 
-                <Coins className="h-5 w-5 text-accent-foreground" />
-              }
-              <div>
-                <p className="font-medium">{token.name}</p>
-                <p className="text-sm text-muted-foreground">{targetType === 'encrypted' ? '加密代币' : 'ERC20代币'}</p>
+                <p className="text-sm text-muted-foreground">
+                  可用余额: {token.balance.toLocaleString()} {token.symbol}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">转换数量</Label>
+            <Label htmlFor="toAddress">接收地址</Label>
+            <Input
+              id="toAddress"
+              placeholder="0x..."
+              value={toAddress}
+              onChange={(e) => setToAddress(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="amount">转账数量</Label>
             <Input
               id="amount"
               type="number"
-              placeholder={`输入要转换的 ${token.symbol} 数量`}
+              placeholder={`输入要转账的 ${token.symbol} 数量`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               max={token.balance}
@@ -120,11 +130,12 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert }: ConvertD
               取消
             </Button>
             <Button 
-              onClick={handleConvert} 
+              onClick={handleTransfer} 
               variant="glow" 
               className="flex-1"
             >
-              确认转换
+              <Send className="h-4 w-4 mr-2" />
+              确认转账
             </Button>
           </div>
         </div>

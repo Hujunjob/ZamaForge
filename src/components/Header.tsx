@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Zap, Menu, Github, Twitter } from "lucide-react";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export const Header = () => {
   return (
@@ -49,9 +50,9 @@ export const Header = () => {
               </Button>
             </div>
 
-            <Button variant="outline" size="sm" className="hidden sm:flex">
-              连接钱包
-            </Button>
+            <div className="hidden sm:flex">
+              <ConnectButton />
+            </div>
             
             <Button variant="ghost" size="sm" className="md:hidden">
               <Menu className="h-4 w-4" />

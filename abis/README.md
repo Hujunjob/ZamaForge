@@ -4,7 +4,8 @@
 
 ### Contracts
 - ConfidentialTokenFactory contract:  0x8d3F4e8fe379dBEA133420Eb6Be79033A0e78593
-- TestCoin contract:  0xD659cfc0D1642aEc9aa7B3fbcd339B836A1b6d60
+- ZamaForge contract : 0xdc5A3601541518A3B52879ef5F231f6A624C93EB
+- Airdrop contract: 0x6dB435EFe22787b6CC4E0DDAb8a6281a8a6E04F1
 
 ## 合约说明
 

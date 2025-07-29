@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm run:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm prisma:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(find:*)",
+      "Bash(node:*)",
+      "Bash(grep:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pkill:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run:*)"
+    ],
+    "deny": []
+  }
+}

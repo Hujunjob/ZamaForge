@@ -5,101 +5,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TokenCard } from "@/components/TokenCard";
 import { CreateTokenDialog } from "@/components/CreateTokenDialog";
 import { ConvertDialog } from "@/components/ConvertDialog";
+import { TransferDialog } from "@/components/TransferDialog";
 import { Header } from "@/components/Header";
-import { Shield, Coins, ArrowLeftRight, Sparkles, Zap, Lock } from "lucide-react";
+import { Shield, Coins, ArrowLeftRight, Sparkles, Zap, Lock, Trash2 } from "lucide-react";
+import { useTokens, Token } from "@/hooks/useTokens";
+import { useToast } from "@/hooks/use-toast";
 import heroImage from "@/assets/hero-blockchain.jpg";
 
-interface Token {
-  id: string;
-  name: string;
-  symbol: string;
-  balance: number;
-  type: 'erc20' | 'encrypted';
-  contractAddress?: string;
-}
-
 const Index = () => {
-  const [tokens, setTokens] = useState<Token[]>([
-    {
-      id: '1',
-      name: 'Zama Token',
-      symbol: 'ZAMA',
-      balance: 10000,
-      type: 'erc20',
-      contractAddress: '0x742d35cc...'
-    },
-    {
-      id: '2',
-      name: 'Private Coin',
-      symbol: 'PRIV',
-      balance: 5000,
-      type: 'encrypted'
-    },
-    {
-      id: '3',
-      name: 'Demo Token',
-      symbol: 'DEMO',
-      balance: 25000,
-      type: 'erc20',
-      contractAddress: '0x123abc45...'
-    }
-  ]);
+  const { tokens, updateToken, clearAllTokens, erc20Tokens, encryptedTokens } = useTokens();
+  const { toast } = useToast();
 
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
-  const handleCreateToken = (tokenData: { name: string; symbol: string; totalSupply: number }) => {
-    const newToken: Token = {
-      id: Date.now().toString(),
-      name: tokenData.name,
-      symbol: tokenData.symbol,
-      balance: tokenData.totalSupply,
-      type: 'erc20',
-      contractAddress: `0x${Math.random().toString(16).slice(2, 10)}...`
-    };
-    setTokens(prev => [...prev, newToken]);
-  };
 
   const handleConvertToken = (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => {
-    setTokens(prev => prev.map(token => {
-      if (token.id === tokenId) {
-        // 减少原代币余额
-        const updatedToken = { ...token, balance: token.balance - amount };
-        
-        // 查找目标类型的同名代币或创建新的
-        const targetTokenExists = prev.find(t => 
-          t.name === token.name && 
-          t.symbol === token.symbol && 
-          t.type === toType
-        );
-        
-        if (!targetTokenExists) {
-          // 创建新的目标类型代币
-          const newTargetToken: Token = {
-            id: Date.now().toString() + '_converted',
-            name: token.name,
-            symbol: token.symbol,
-            balance: amount,
-            type: toType,
-            contractAddress: toType === 'erc20' ? `0x${Math.random().toString(16).slice(2, 10)}...` : undefined
-          };
-          setTimeout(() => {
-            setTokens(current => [...current, newTargetToken]);
-          }, 0);
-        }
-        
-        return updatedToken;
-      }
-      
-      // 增加目标类型代币余额
-      if (token.name === selectedToken?.name && 
-          token.symbol === selectedToken?.symbol && 
-          token.type === toType) {
-        return { ...token, balance: token.balance + amount };
-      }
-      
-      return token;
-    }));
+    const sourceToken = tokens.find(t => t.id === tokenId);
+    if (!sourceToken || sourceToken.balance < amount) return;
+
+    // 减少源代币余额
+    updateToken(tokenId, { balance: sourceToken.balance - amount });
+
+    // 查找是否已存在目标类型的同名代币
+    const existingTargetToken = tokens.find(t => 
+      t.name === sourceToken.name && 
+      t.symbol === sourceToken.symbol && 
+      t.type === toType
+    );
+
+    if (existingTargetToken) {
+      // 增加现有目标代币余额
+      updateToken(existingTargetToken.id, { 
+        balance: existingTargetToken.balance + amount 
+      });
+    } else {
+      // 创建新的目标类型代币
+      addToken({
+        name: sourceToken.name,
+        symbol: sourceToken.symbol,
+        balance: amount,
+        type: toType,
+        contractAddress: `0x${Math.random().toString(16).slice(2, 42)}`,
+        isBalanceEncrypted: toType === 'encrypted'
+      });
+    }
   };
 
   const handleTokenConvert = (token: Token) => {
@@ -107,8 +58,28 @@ const Index = () => {
     setConvertDialogOpen(true);
   };
 
-  const erc20Tokens = tokens.filter(token => token.type === 'erc20');
-  const encryptedTokens = tokens.filter(token => token.type === 'encrypted');
+  const handleTokenTransfer = (token: Token) => {
+    setSelectedToken(token);
+    setTransferDialogOpen(true);
+  };
+
+  const handleTransfer = (tokenId: string, toAddress: string, amount: number) => {
+    const sourceToken = tokens.find(t => t.id === tokenId);
+    if (sourceToken && sourceToken.balance >= amount) {
+      updateToken(tokenId, { balance: sourceToken.balance - amount });
+    }
+  };
+
+  const handleClearCache = () => {
+    if (confirm('确定要清除所有代币缓存吗？这将删除所有本地存储的代币数据。')) {
+      clearAllTokens();
+      toast({
+        title: "缓存已清除",
+        description: "所有本地存储的代币数据已删除",
+      });
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,7 +121,7 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
-              <CreateTokenDialog onCreateToken={handleCreateToken} />
+              <CreateTokenDialog />
               <Button variant="outline" size="lg" className="group">
                 <span>了解更多</span>
                 <Sparkles className="ml-2 h-4 w-4" />
@@ -236,9 +207,21 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-black mb-6 bg-gradient-primary bg-clip-text text-transparent">
-              代币管理中心
-            </h2>
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <h2 className="text-4xl md:text-6xl font-black bg-gradient-primary bg-clip-text text-transparent">
+                代币管理中心
+              </h2>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleClearCache}
+                className="ml-4 text-red-500 border-red-500/30 hover:bg-red-500/10 hover:border-red-500"
+                title="清除所有代币缓存"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                清除缓存
+              </Button>
+            </div>
             <p className="text-xl md:text-2xl text-foreground/80 font-medium">
               管理您的数字资产王国
             </p>
@@ -267,6 +250,7 @@ const Index = () => {
                     key={token.id} 
                     token={token} 
                     onConvert={handleTokenConvert}
+                    onTransfer={handleTokenTransfer}
                   />
                 ))}
               </div>
@@ -279,6 +263,7 @@ const Index = () => {
                     key={token.id} 
                     token={token} 
                     onConvert={handleTokenConvert}
+                    onTransfer={handleTokenTransfer}
                   />
                 ))}
               </div>
@@ -297,6 +282,7 @@ const Index = () => {
                     key={token.id} 
                     token={token} 
                     onConvert={handleTokenConvert}
+                    onTransfer={handleTokenTransfer}
                   />
                 ))}
               </div>
@@ -316,6 +302,13 @@ const Index = () => {
         onOpenChange={setConvertDialogOpen}
         token={selectedToken}
         onConvert={handleConvertToken}
+      />
+      
+      <TransferDialog
+        open={transferDialogOpen}
+        onOpenChange={setTransferDialogOpen}
+        token={selectedToken}
+        onTransfer={handleTransfer}
       />
     </div>
   );
