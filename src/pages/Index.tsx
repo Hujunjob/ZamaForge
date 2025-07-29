@@ -12,8 +12,9 @@ import { useTokens, Token } from "@/hooks/useTokens";
 import { useToast } from "@/hooks/use-toast";
 import { useConfidentialTokenFactory } from "@/hooks/useConfidentialTokenFactory";
 import { useTokenTransfer } from "@/hooks/useTokenTransfer";
+import { useUnwrapToken } from "@/hooks/useUnwrapToken";
 import { readContract } from '@wagmi/core';
-import { useConfig } from 'wagmi';
+import { useConfig, useAccount } from 'wagmi';
 import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.json';
 import heroImage from "@/assets/hero-blockchain.jpg";
 
@@ -22,7 +23,9 @@ const Index = () => {
   const { toast } = useToast();
   const { wrapERC20, isPending: isWrapping, isConfirmed, error: wrapError } = useConfidentialTokenFactory();
   const { transferERC20, transferConfidential, isTransferring, isEncrypting } = useTokenTransfer();
+  const { unwrapConfidentialToken, isUnwrapping, isEncrypting: isUnwrapEncrypting } = useUnwrapToken();
   const config = useConfig();
+  const { address } = useAccount();
   
   // ConfidentialTokenFactory合约地址
   const FACTORY_CONTRACT_ADDRESS = '0x8d3F4e8fe379dBEA133420Eb6Be79033A0e78593' as const;
@@ -120,13 +123,79 @@ const Index = () => {
         }
 
       } else if (sourceToken.type === 'encrypted' && toType === 'erc20') {
-        // 加密代币转换为ERC20：调用 unwrap (需要实现)
+        // 加密代币转换为ERC20：调用 unwrap
+        if (!sourceToken.contractAddress) {
+          toast({
+            title: "错误", 
+            description: "缺少加密代币合约地址",
+            variant: "destructive"
+          });
+          return;
+        }
+
         toast({
-          title: "功能开发中",
-          description: "加密代币转换为ERC20功能正在开发中",
-          variant: "destructive"
+          title: "正在转换",
+          description: "正在将加密代币转换为ERC20代币，请确认交易..."
         });
-        return;
+
+        // 获取对应的ERC20代币地址
+        const erc20TokenAddress = await readContract(config, {
+          address: FACTORY_CONTRACT_ADDRESS,
+          abi: factoryAbi,
+          functionName: 'getERC20',
+          args: [sourceToken.contractAddress],
+        }) as `0x${string}`;
+
+        if (!erc20TokenAddress || erc20TokenAddress === '0x0000000000000000000000000000000000000000') {
+          toast({
+            title: "错误",
+            description: "找不到对应的ERC20代币",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        await unwrapConfidentialToken(
+          sourceToken.contractAddress as `0x${string}`,
+          address as `0x${string}`,
+          amount
+        );
+        
+        toast({
+          title: "转换成功",
+          description: `已将 ${amount} ${sourceToken.symbol} 加密代币转换为ERC20代币`
+        });
+
+        // 更新本地状态 - 减少加密代币余额
+        if (sourceToken.isBalanceEncrypted && sourceToken.decryptedBalance) {
+          const newDecryptedBalance = Number(sourceToken.decryptedBalance) - (amount * Math.pow(10, sourceToken.decimals || 18));
+          updateToken(tokenId, { decryptedBalance: newDecryptedBalance.toString() });
+        } else {
+          updateToken(tokenId, { balance: sourceToken.balance - amount });
+        }
+
+        // 查找是否已存在目标类型的同名代币
+        const existingTargetToken = tokens.find(t => 
+          t.name === sourceToken.name && 
+          t.symbol === sourceToken.symbol && 
+          t.type === toType
+        );
+
+        if (existingTargetToken) {
+          updateToken(existingTargetToken.id, { 
+            balance: existingTargetToken.balance + amount 
+          });
+        } else {
+          // 创建新的ERC20代币记录
+          addToken({
+            name: sourceToken.name.replace(" (加密)", ""), // 移除加密标识
+            symbol: sourceToken.symbol.replace("c", ""), // 移除加密前缀
+            balance: amount,
+            type: toType,
+            contractAddress: erc20TokenAddress,
+            isBalanceEncrypted: false
+          });
+        }
       }
 
     } catch (error) {
@@ -484,7 +553,7 @@ const Index = () => {
         onOpenChange={setConvertDialogOpen}
         token={selectedToken}
         onConvert={handleConvertToken}
-        isLoading={isWrapping}
+        isLoading={isWrapping || isUnwrapping || isUnwrapEncrypting}
       />
       
       <TransferDialog

@@ -255,16 +255,65 @@ export const useConfidentialTokenWrapper = (wrapperAddress: `0x${string}`) => {
     hash,
   });
 
-  // 解包装加密代币为普通代币
-  const unwrap = async (fromAddress: `0x${string}`, toAddress: `0x${string}`, encryptedAmount: string) => {
+  // 解包装加密代币为普通代币 (需要加密金额)
+  const unwrapWithEncryption = async (toAddress: `0x${string}`, amount: number, zamaSDK: any) => {
     if (!address) throw new Error('钱包未连接');
     
     try {
+      console.log('🔐 开始解包装加密代币:', { wrapperAddress, toAddress, amount, address });
+      
+      // Convert amount to proper units (assuming 6 decimals for encrypted tokens)
+      const amountInWei = amount * 1000000;
+      console.log('💰 转换金额:', { amount, amountInWei: amountInWei.toString() });
+      
+      // Create encrypted input buffer
+      console.log('🛡️ 创建加密输入缓冲区...');
+      const buffer = zamaSDK.createEncryptedInput(wrapperAddress, address);
+      
+      // Add the amount as uint64 (wei amount)
+      buffer.add64(BigInt(amountInWei));
+      console.log('📦 添加金额到缓冲区:', BigInt(amountInWei.toString()).toString());
+      
+      // Encrypt the values and get ciphertexts
+      console.log('🔐 开始加密...');
+      const ciphertexts = await buffer.encrypt();
+
+      console.log('✅ 加密完成:', {
+        handles: ciphertexts.handles,
+        inputProofLength: ciphertexts.inputProof.length,
+      });
+      
+      // Convert handle to hex string if it's a Uint8Array
+      const encryptedAmount = ciphertexts.handles[0];
+      let handleValue: `0x${string}`;
+      if (encryptedAmount instanceof Uint8Array) {
+        handleValue = ('0x' + Array.from(encryptedAmount).map(b => b.toString(16).padStart(2, '0')).join('')) as `0x${string}`;
+      } else {
+        handleValue = encryptedAmount as `0x${string}`;
+      }
+      
+      // Convert inputProof to hex string if it's a Uint8Array
+      const inputProof = ciphertexts.inputProof;
+      let inputProofValue: `0x${string}`;
+      if (inputProof instanceof Uint8Array) {
+        inputProofValue = ('0x' + Array.from(inputProof).map(b => b.toString(16).padStart(2, '0')).join('')) as `0x${string}`;
+      } else {
+        inputProofValue = inputProof as `0x${string}`;
+      }
+      
+      console.log('📞 准备调用unwrap:', {
+        address: wrapperAddress,
+        functionName: 'unwrap',
+        args: [address, toAddress, handleValue, inputProofValue],
+        chain: sepolia.name,
+        account: address,
+      });
+      
       writeContract({
         address: wrapperAddress,
         abi: wrapperAbi,
         functionName: 'unwrap',
-        args: [fromAddress, toAddress, encryptedAmount],
+        args: [address, toAddress, handleValue, inputProofValue],
         chain: sepolia,
         account: address,
       });
@@ -288,7 +337,7 @@ export const useConfidentialTokenWrapper = (wrapperAddress: `0x${string}`) => {
   });
 
   return {
-    unwrap,
+    unwrapWithEncryption,
     confidentialBalance,
     hash,
     isPending,
