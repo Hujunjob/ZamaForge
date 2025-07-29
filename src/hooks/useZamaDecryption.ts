@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
-import { createInstance, SepoliaConfig } from '@zama-fhe/relayer-sdk/bundle';
-import { initSDK } from '@zama-fhe/relayer-sdk/bundle';
+import { useZamaSDK } from '@/contexts/ZamaSDKContext';
 
 interface DecryptionState {
   isDecrypting: boolean;
@@ -11,48 +10,11 @@ interface DecryptionState {
 export const useZamaDecryption = () => {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const { initializeSDK, instance, isInitialized } = useZamaSDK();
   const [state, setState] = useState<DecryptionState>({
     isDecrypting: false,
     error: null,
   });
-  const [isSDKInitialized, setIsSDKInitialized] = useState(false);
-  const [instance, setInstance] = useState<any>(null);
-
-  // Initialize SDK and create instance
-  const initializeSDK = useCallback(async () => {
-    if (isSDKInitialized && instance) {
-      return instance;
-    }
-    console.log("initializeSDK");
-    
-    try {
-      setState(prev => ({ ...prev, isDecrypting: true, error: null }));
-      
-      // Initialize the SDK
-      await initSDK();
-      
-      // Create instance with Sepolia config
-      const config = { 
-        ...SepoliaConfig, 
-        network: window.ethereum 
-      };
-      const fhevmInstance = await createInstance(config);
-      
-      setInstance(fhevmInstance);
-      setIsSDKInitialized(true);
-      
-      setState(prev => ({ ...prev, isDecrypting: false }));
-      return fhevmInstance;
-    } catch (error) {
-      console.error('Failed to initialize SDK:', error);
-      setState(prev => ({ 
-        ...prev, 
-        isDecrypting: false, 
-        error: '初始化SDK失败' 
-      }));
-      throw error;
-    }
-  }, [isSDKInitialized, instance]);
 
   // Decrypt encrypted balance
   const decryptBalance = useCallback(async (
@@ -61,6 +23,13 @@ export const useZamaDecryption = () => {
   ): Promise<string> => {
     if (!address || !walletClient) {
       throw new Error('钱包未连接');
+    }
+
+    // Check if handle is zero (0x0000000000000000000000000000000000000000000000000000000000000000)
+    const zeroHandle = '0x0000000000000000000000000000000000000000000000000000000000000000';
+    if (ciphertextHandle === zeroHandle || ciphertextHandle === '0x0' || !ciphertextHandle) {
+      setState(prev => ({ ...prev, isDecrypting: false, error: null }));
+      return '0';
     }
 
     try {
@@ -119,7 +88,12 @@ export const useZamaDecryption = () => {
       const decryptedValue = result[ciphertextHandle];
       setState(prev => ({ ...prev, isDecrypting: false }));
       
-      return decryptedValue?.toString() || '0';
+      // Handle case where decryption returns undefined/null or zero value
+      if (decryptedValue === undefined || decryptedValue === null) {
+        return '0';
+      }
+      
+      return decryptedValue.toString();
     } catch (error) {
       console.error('解密失败:', error);
       setState(prev => ({ 
@@ -127,7 +101,10 @@ export const useZamaDecryption = () => {
         isDecrypting: false, 
         error: '解密失败，请重试' 
       }));
-      throw error;
+      
+      // If decryption fails, return '0' instead of throwing error
+      console.warn('解密失败，返回默认值 0');
+      return '0';
     }
   }, [address, walletClient, initializeSDK]);
 
@@ -135,7 +112,7 @@ export const useZamaDecryption = () => {
     decryptBalance,
     isDecrypting: state.isDecrypting,
     error: state.error,
-    isSDKInitialized,
+    isSDKInitialized: isInitialized,
     initializeSDK,
   };
 };

@@ -11,6 +11,7 @@ import { Shield, Coins, ArrowLeftRight, Sparkles, Zap, Lock, Trash2 } from "luci
 import { useTokens, Token } from "@/hooks/useTokens";
 import { useToast } from "@/hooks/use-toast";
 import { useConfidentialTokenFactory } from "@/hooks/useConfidentialTokenFactory";
+import { useTokenTransfer } from "@/hooks/useTokenTransfer";
 import { readContract } from '@wagmi/core';
 import { useConfig } from 'wagmi';
 import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.json';
@@ -20,6 +21,7 @@ const Index = () => {
   const { tokens, addToken, updateToken, clearAllTokens, erc20Tokens, encryptedTokens } = useTokens();
   const { toast } = useToast();
   const { wrapERC20, isPending: isWrapping, isConfirmed, error: wrapError } = useConfidentialTokenFactory();
+  const { transferERC20, transferConfidential, isTransferring, isEncrypting } = useTokenTransfer();
   const config = useConfig();
   
   // ConfidentialTokenFactory合约地址
@@ -130,10 +132,89 @@ const Index = () => {
     setTransferDialogOpen(true);
   };
 
-  const handleTransfer = (tokenId: string, toAddress: string, amount: number) => {
+  const handleTransfer = async (tokenId: string, toAddress: string, amount: number) => {
     const sourceToken = tokens.find(t => t.id === tokenId);
-    if (sourceToken && sourceToken.balance >= amount) {
-      updateToken(tokenId, { balance: sourceToken.balance - amount });
+    if (!sourceToken) {
+      toast({
+        title: "错误",
+        description: "找不到代币信息",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!sourceToken.contractAddress) {
+      toast({
+        title: "错误",
+        description: "缺少代币合约地址",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      if (sourceToken.type === 'encrypted') {
+        // 加密代币转账 - 使用 confidentialTransfer
+        toast({
+          title: "正在转账",
+          description: "正在加密转账金额，请稍候..."
+        });
+
+        await transferConfidential(
+          sourceToken.contractAddress, 
+          toAddress as `0x${string}`, 
+          amount
+        );
+
+        toast({
+          title: "转账成功",
+          description: `已向 ${toAddress.slice(0, 6)}...${toAddress.slice(-4)} 转账 ${amount} ${sourceToken.symbol}（加密）`
+        });
+
+        // 更新本地余额（减少发送方余额）
+        const actualBalance = sourceToken.isBalanceEncrypted && sourceToken.decryptedBalance
+          ? Number(sourceToken.decryptedBalance) / Math.pow(10, sourceToken.decimals || 18)
+          : sourceToken.balance;
+        
+        if (actualBalance >= amount) {
+          if (sourceToken.isBalanceEncrypted && sourceToken.decryptedBalance) {
+            const newDecryptedBalance = Number(sourceToken.decryptedBalance) - (amount * Math.pow(10, sourceToken.decimals || 18));
+            updateToken(tokenId, { decryptedBalance: newDecryptedBalance.toString() });
+          } else {
+            updateToken(tokenId, { balance: sourceToken.balance - amount });
+          }
+        }
+
+      } else {
+        // ERC20 代币转账 - 使用标准 transfer
+        toast({
+          title: "正在转账",
+          description: "正在发起ERC20转账，请确认交易..."
+        });
+
+        await transferERC20(
+          sourceToken.contractAddress, 
+          toAddress as `0x${string}`, 
+          amount
+        );
+
+        toast({
+          title: "转账成功", 
+          description: `已向 ${toAddress.slice(0, 6)}...${toAddress.slice(-4)} 转账 ${amount} ${sourceToken.symbol}`
+        });
+
+        // 更新本地余额（减少发送方余额）
+        if (sourceToken.balance >= amount) {
+          updateToken(tokenId, { balance: sourceToken.balance - amount });
+        }
+      }
+    } catch (error) {
+      console.error('转账失败:', error);
+      toast({
+        title: "转账失败",
+        description: error instanceof Error ? error.message : "未知错误",
+        variant: "destructive"
+      });
     }
   };
 
@@ -380,6 +461,8 @@ const Index = () => {
         onOpenChange={setTransferDialogOpen}
         token={selectedToken}
         onTransfer={handleTransfer}
+        isTransferring={isTransferring}
+        isEncrypting={isEncrypting}
       />
     </div>
   );

@@ -27,10 +27,12 @@ interface TransferDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   token: Token | null;
-  onTransfer: (tokenId: string, toAddress: string, amount: number) => void;
+  onTransfer: (tokenId: string, toAddress: string, amount: number) => Promise<void>;
+  isTransferring?: boolean;
+  isEncrypting?: boolean;
 }
 
-export const TransferDialog = ({ open, onOpenChange, token, onTransfer }: TransferDialogProps) => {
+export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransferring = false, isEncrypting = false }: TransferDialogProps) => {
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
   const { toast } = useToast();
@@ -54,7 +56,7 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer }: Transf
     return token.balance;
   };
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
     const transferAmount = parseFloat(amount);
     
     if (!toAddress || !toAddress.startsWith('0x') || toAddress.length !== 42) {
@@ -84,16 +86,17 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer }: Transf
       return;
     }
 
-    onTransfer(token.id, toAddress, transferAmount);
-    
-    toast({
-      title: "转账成功",
-      description: `已向 ${toAddress.slice(0, 6)}...${toAddress.slice(-4)} 转账 ${transferAmount} ${token.symbol}`,
-    });
-
-    setToAddress("");
-    setAmount("");
-    onOpenChange(false);
+    try {
+      await onTransfer(token.id, toAddress, transferAmount);
+      
+      // Only close dialog and clear fields on successful transfer
+      setToAddress("");
+      setAmount("");
+      onOpenChange(false);
+    } catch (error) {
+      // Error handling is done in the parent component
+      console.error('Transfer dialog error:', error);
+    }
   };
 
   return (
@@ -166,9 +169,10 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer }: Transf
               onClick={handleTransfer} 
               variant="glow" 
               className="flex-1"
+              disabled={isTransferring || isEncrypting}
             >
               <Send className="h-4 w-4 mr-2" />
-              确认转账
+              {isEncrypting ? '加密中...' : isTransferring ? '转账中...' : '确认转账'}
             </Button>
           </div>
         </div>

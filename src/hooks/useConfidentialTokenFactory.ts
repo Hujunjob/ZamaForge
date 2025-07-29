@@ -187,7 +187,7 @@ export const useConfidentialTokenFactory = () => {
 
   // 检查是否有足够的授权额度（基于 useReadContract 的结果）
   const hasEnoughAllowance = (erc20Address: `0x${string}`, amount: number) => {
-    const allowance = checkAllowance(erc20Address);
+    const allowance = useAllowance(erc20Address);
     if (!allowance) return false;
     
     const amountInWei = parseEther(amount.toString());
@@ -204,7 +204,7 @@ export const useConfidentialTokenFactory = () => {
   });
 
   // 获取加密代币对应的普通代币地址
-  const getERC20Address = (confidentialTokenAddress: `0x${string}`) => {
+  const useERC20Address = (confidentialTokenAddress: `0x${string}`) => {
     const { data: erc20Address } = useReadContract({
       address: FACTORY_CONTRACT_ADDRESS,
       abi: factoryAbi,
@@ -216,7 +216,7 @@ export const useConfidentialTokenFactory = () => {
   };
 
   // 检查ERC20代币授权额度
-  const checkAllowance = (erc20Address: `0x${string}`) => {
+  const useAllowance = (erc20Address: `0x${string}`) => {
     const { data: allowance } = useReadContract({
       address: erc20Address,
       abi: erc20Abi,
@@ -231,8 +231,8 @@ export const useConfidentialTokenFactory = () => {
     approveERC20,
     wrapERC20,
     wrapERC20WithApproval,
-    getERC20Address,
-    checkAllowance,
+    useERC20Address,
+    useAllowance,
     checkAllowanceAsync,
     hasEnoughAllowance,
     confidentialTokenAddress,

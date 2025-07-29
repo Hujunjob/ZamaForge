@@ -43,7 +43,7 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
     token.decryptedBalance || null
   );
   const { toast } = useToast();
-  const { decryptBalance, isDecrypting, error: decryptError } = useZamaDecryption();
+  const { decryptBalance, isDecrypting } = useZamaDecryption();
   
   // Get confidential balance handle for encrypted tokens
   const { confidentialBalance } = useConfidentialTokenWrapper(
@@ -98,16 +98,24 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
             onUpdateToken(token.id, { decryptedBalance: decrypted });
           }
           
-          toast({
-            title: "解密成功",
-            description: "余额已解密显示",
-          });
+          // 只有成功解密且不是零值时才显示成功提示
+          if (decrypted !== '0') {
+            toast({
+              title: "解密成功",
+              description: "余额已解密显示",
+            });
+          }
         } catch (error) {
-          toast({
-            title: "解密失败",
-            description: decryptError || "解密过程中出现错误",
-            variant: "destructive",
-          });
+          console.error('解密过程中出现错误:', error);
+          
+          // 对于零值句柄或解密失败，设置为0但不显示错误提示
+          setDecryptedBalance('0');
+          setIsBalanceVisible(true);
+          
+          // 更新token状态
+          if (onUpdateToken) {
+            onUpdateToken(token.id, { decryptedBalance: '0' });
+          }
         }
       } else {
         // 已解密，切换显示/隐藏
@@ -192,11 +200,11 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
               >
                 {isDecrypting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
-                ) : decryptedBalance ? (
-                  // 已解密，显示隐藏图标（因为余额已显示）
+                ) : decryptedBalance && isBalanceVisible ? (
+                  // 已解密且显示中，显示隐藏图标
                   <EyeOff className="h-4 w-4" />
                 ) : (
-                  // 未解密，显示显示图标
+                  // 未解密或已解密但隐藏中，显示显示图标
                   <Eye className="h-4 w-4" />
                 )}
               </Button>
