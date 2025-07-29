@@ -22,13 +22,13 @@ export const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-foreground/80 hover:text-primary transition-colors">
+            <a href="#features" className="text-foreground/80 hover:text-primary">
               功能特性
             </a>
-            <a href="#tokens" className="text-foreground/80 hover:text-primary transition-colors">
+            <a href="#tokens" className="text-foreground/80 hover:text-primary">
               代币管理
             </a>
-            <a href="#docs" className="text-foreground/80 hover:text-primary transition-colors">
+            <a href="#docs" className="text-foreground/80 hover:text-primary">
               开发文档
             </a>
           </nav>

@@ -177,13 +177,13 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <Card className="group hover:shadow-neon hover:-translate-y-4 hover:scale-105 transition-all duration-500 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+            <Card className="group hover:shadow-neon hover:-translate-y-4 hover:scale-105 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10"></div>
               <CardHeader className="text-center relative z-10 pt-8">
                 <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 shadow-glow">
                   <Coins className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow transition-colors duration-300">
+                <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow">
                   ERC20代币生成
                 </CardTitle>
               </CardHeader>
@@ -194,13 +194,13 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-neon hover:-translate-y-4 hover:scale-105 transition-all duration-500 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+            <Card className="group hover:shadow-neon hover:-translate-y-4 hover:scale-105 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10"></div>
               <CardHeader className="text-center relative z-10 pt-8">
                 <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 shadow-glow">
                   <ArrowLeftRight className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow transition-colors duration-300">
+                <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow">
                   无缝代币转换
                 </CardTitle>
               </CardHeader>
@@ -211,13 +211,13 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-neon hover:-translate-y-4 hover:scale-105 transition-all duration-500 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+            <Card className="group hover:shadow-neon hover:-translate-y-4 hover:scale-105 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-10"></div>
               <CardHeader className="text-center relative z-10 pt-8">
                 <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mb-6 shadow-glow">
                   <Shield className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow transition-colors duration-300">
+                <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow">
                   全同态加密
                 </CardTitle>
               </CardHeader>
@@ -246,15 +246,15 @@ const Index = () => {
 
           <Tabs defaultValue="all" className="w-full max-w-6xl mx-auto">
             <TabsList className="grid w-full grid-cols-3 mb-12 h-16 bg-gradient-card border-2 border-primary/20 shadow-card backdrop-blur-sm">
-              <TabsTrigger value="all" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
+              <TabsTrigger value="all" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                 <Zap className="h-5 w-5" />
                 全部代币
               </TabsTrigger>
-              <TabsTrigger value="erc20" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
+              <TabsTrigger value="erc20" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                 <Coins className="h-5 w-5" />
                 ERC20代币
               </TabsTrigger>
-              <TabsTrigger value="encrypted" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
+              <TabsTrigger value="encrypted" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                 <Lock className="h-5 w-5" />
                 加密代币
               </TabsTrigger>

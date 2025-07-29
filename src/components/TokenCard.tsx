@@ -19,8 +19,8 @@ interface TokenCardProps {
 
 export const TokenCard = ({ token, onConvert }: TokenCardProps) => {
   return (
-    <Card className="group hover:shadow-neon hover:-translate-y-2 hover:scale-105 transition-all duration-500 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+    <Card className="group hover:shadow-neon hover:-translate-y-2 hover:scale-105 border-2 border-primary/20 bg-gradient-card backdrop-blur-sm overflow-hidden relative">
+      <div className="absolute inset-0 bg-gradient-primary opacity-0 group-hover:opacity-5"></div>
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-neon"></div>
       
       <CardHeader className="pb-4 relative z-10">
@@ -38,7 +38,7 @@ export const TokenCard = ({ token, onConvert }: TokenCardProps) => {
               )}
             </div>
             <div>
-              <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary-glow transition-colors duration-300">
+              <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary-glow">
                 {token.name}
               </CardTitle>
               <p className="text-base text-foreground/60 font-medium">{token.symbol}</p>
