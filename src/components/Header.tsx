@@ -34,7 +34,7 @@ export const Header = () => {
               {t('nav.tokens')}
             </a>
             <a href="#docs" className="text-foreground/80 hover:text-primary">
-              开发文档
+              {t('nav.docs')}
             </a>
           </nav>
 
@@ -42,7 +42,7 @@ export const Header = () => {
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="hidden sm:flex items-center gap-2 bg-primary/10 border-primary/30 text-primary">
               <Zap className="h-3 w-3" />
-              Beta版本
+              {t('nav.beta')}
             </Badge>
             
             <div className="hidden md:flex items-center gap-2">

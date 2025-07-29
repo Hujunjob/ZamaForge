@@ -71,16 +71,16 @@ const Index = () => {
         // ERC20 转换为加密代币：调用 wrapERC20
         if (!sourceToken.contractAddress) {
           toast({
-            title: "错误", 
-            description: "缺少合约地址",
+            title: t('common.error'), 
+            description: t('convert.messages.missingContract'),
             variant: "destructive"
           });
           return;
         }
 
         toast({
-          title: "正在转换",
-          description: "正在将ERC20代币转换为加密代币，请确认交易..."
+          title: t('convert.messages.converting'),
+          description: t('convert.messages.convertingToEncrypted')
         });
 
         await wrapERC20(sourceToken.contractAddress as `0x${string}`, amount);
@@ -94,8 +94,8 @@ const Index = () => {
         }) as `0x${string}`;
         
         toast({
-          title: "转换成功",
-          description: `已将 ${amount} ${sourceToken.symbol} 转换为加密代币`
+          title: t('convert.messages.success'),
+          description: t('convert.messages.convertedToEncrypted', { amount, symbol: sourceToken.symbol })
         });
 
         // 更新本地状态
@@ -128,16 +128,16 @@ const Index = () => {
         // 加密代币转换为ERC20：调用 unwrap
         if (!sourceToken.contractAddress) {
           toast({
-            title: "错误", 
-            description: "缺少加密代币合约地址",
+            title: t('common.error'), 
+            description: t('convert.messages.missingEncryptedContract'),
             variant: "destructive"
           });
           return;
         }
 
         toast({
-          title: "正在转换",
-          description: "正在将加密代币转换为ERC20代币，请确认交易..."
+          title: t('convert.messages.converting'),
+          description: t('convert.messages.convertingToErc20')
         });
 
         // 获取对应的ERC20代币地址
@@ -150,8 +150,8 @@ const Index = () => {
 
         if (!erc20TokenAddress || erc20TokenAddress === '0x0000000000000000000000000000000000000000') {
           toast({
-            title: "错误",
-            description: "找不到对应的ERC20代币",
+            title: t('common.error'),
+            description: t('convert.messages.noCorrespondingErc20'),
             variant: "destructive"
           });
           return;
@@ -164,8 +164,8 @@ const Index = () => {
         );
         
         toast({
-          title: "转换成功",
-          description: `已将 ${amount} ${sourceToken.symbol} 加密代币转换为ERC20代币`
+          title: t('convert.messages.success'),
+          description: t('convert.messages.convertedToErc20', { amount, symbol: sourceToken.symbol })
         });
 
         // 更新本地状态 - 减少加密代币余额
@@ -203,8 +203,8 @@ const Index = () => {
     } catch (error) {
       console.error('转换失败:', error);
       toast({
-        title: "转换失败",
-        description: error instanceof Error ? error.message : "未知错误",
+        title: t('convert.messages.failed'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: "destructive"
       });
     }
@@ -229,8 +229,8 @@ const Index = () => {
     if (!sourceToken) {
       console.error('❌ 找不到代币信息');
       toast({
-        title: "错误",
-        description: "找不到代币信息",
+        title: t('common.error'),
+        description: t('transfer.messages.tokenNotFound'),
         variant: "destructive"
       });
       return;
@@ -239,8 +239,8 @@ const Index = () => {
     if (!sourceToken.contractAddress) {
       console.error('❌ 缺少代币合约地址');
       toast({
-        title: "错误",
-        description: "缺少代币合约地址",
+        title: t('common.error'),
+        description: t('transfer.messages.missingContract'),
         variant: "destructive"
       });
       return;
@@ -253,8 +253,8 @@ const Index = () => {
         
         // Immediately show encrypting state
         toast({
-          title: "正在转账",
-          description: "正在加密转账金额，请稍候..."
+          title: t('transfer.messages.transferring'),
+          description: t('transfer.messages.encryptingAmount')
         });
 
         console.log('📞 调用transferConfidential...');
@@ -266,8 +266,8 @@ const Index = () => {
         console.log('✅ transferConfidential调用完成:', result);
 
         toast({
-          title: "转账成功",
-          description: `已向 ${toAddress.slice(0, 6)}...${toAddress.slice(-4)} 转账 ${amount} ${sourceToken.symbol}（加密）`
+          title: t('transfer.messages.success'),
+          description: t('transfer.messages.encryptedTransferSuccess', { amount, symbol: sourceToken.symbol, address: `${toAddress.slice(0, 6)}...${toAddress.slice(-4)}` })
         });
 
         // 更新本地余额（减少发送方余额）
@@ -288,8 +288,8 @@ const Index = () => {
         // ERC20 代币转账 - 使用标准 transfer
         console.log('💰 开始ERC20代币转账流程');
         toast({
-          title: "正在转账",
-          description: "正在发起ERC20转账，请确认交易..."
+          title: t('transfer.messages.transferring'),
+          description: t('transfer.messages.initiatingErc20')
         });
 
         console.log('📞 调用transferERC20...');
@@ -301,8 +301,8 @@ const Index = () => {
         console.log('✅ transferERC20调用完成:', result);
 
         toast({
-          title: "转账成功", 
-          description: `已向 ${toAddress.slice(0, 6)}...${toAddress.slice(-4)} 转账 ${amount} ${sourceToken.symbol}`
+          title: t('transfer.messages.success'), 
+          description: t('transfer.messages.erc20TransferSuccess', { amount, symbol: sourceToken.symbol, address: `${toAddress.slice(0, 6)}...${toAddress.slice(-4)}` })
         });
 
         // 更新本地余额（减少发送方余额）
@@ -313,8 +313,8 @@ const Index = () => {
     } catch (error) {
       console.error('转账失败:', error);
       toast({
-        title: "转账失败",
-        description: error instanceof Error ? error.message : "未知错误",
+        title: t('transfer.messages.failed'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
         variant: "destructive"
       });
     }

@@ -78,7 +78,7 @@ export const useTokenTransfer = () => {
       setState(prev => ({ 
         ...prev, 
         isTransferring: false, 
-        error: '转账失败' 
+        error: 'Transfer failed' 
       }));
       throw error;
     }
@@ -190,7 +190,7 @@ export const useTokenTransfer = () => {
         ...prev, 
         isEncrypting: false,
         isTransferring: false, 
-        error: '加密转账失败' 
+        error: 'Encrypted transfer failed' 
       }));
       throw error;
     }

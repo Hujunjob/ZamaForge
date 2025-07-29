@@ -127,7 +127,7 @@ export const useUnwrapToken = () => {
         ...prev, 
         isEncrypting: false,
         isUnwrapping: false, 
-        error: '解包装失败' 
+        error: 'Unwrap failed' 
       }));
       throw error;
     }

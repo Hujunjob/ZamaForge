@@ -63,7 +63,7 @@ export const ZamaSDKProvider: React.FC<ZamaSDKProviderProps> = ({ children }) =>
       return fhevmInstance;
     } catch (error) {
       console.error('Failed to initialize SDK:', error);
-      setError('初始化SDK失败');
+      setError('SDK initialization failed');
       setIsInitializing(false);
       throw error;
     }

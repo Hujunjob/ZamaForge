@@ -2,7 +2,9 @@
   "nav": {
     "home": "Home",
     "features": "Features",
-    "tokens": "Tokens"
+    "tokens": "Tokens",
+    "docs": "Documentation",
+    "beta": "Beta"
   },
   "hero": {
     "badge": "Fully Homomorphic Encryption Blockchain Revolution",
@@ -87,7 +89,9 @@
       "success": "Conversion successful",
       "convertedToEncrypted": "Successfully converted {{amount}} {{symbol}} to encrypted token",
       "convertedToErc20": "Successfully converted {{amount}} {{symbol}} encrypted token to ERC20 token",
-      "failed": "Conversion failed"
+      "failed": "Conversion failed",
+      "sdkInitFailed": "SDK initialization failed",
+      "unwrapFailed": "Unwrap failed"
     }
   },
   "transfer": {

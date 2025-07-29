@@ -2,7 +2,9 @@
   "nav": {
     "home": "Accueil",
     "features": "Fonctionnalités",
-    "tokens": "Jetons"
+    "tokens": "Jetons",
+    "docs": "Documentation",
+    "beta": "Bêta"
   },
   "hero": {
     "badge": "Révolution de la Blockchain avec Chiffrement Homomorphe Complet",
@@ -87,7 +89,9 @@
       "success": "Conversion réussie",
       "convertedToEncrypted": "{{amount}} {{symbol}} convertis avec succès en jeton chiffré",
       "convertedToErc20": "{{amount}} {{symbol}} jeton chiffré convertis avec succès en jeton ERC20",
-      "failed": "Échec de la conversion"
+      "failed": "Échec de la conversion",
+      "sdkInitFailed": "Échec de l'initialisation du SDK",
+      "unwrapFailed": "Échec du déballage"
     }
   },
   "transfer": {

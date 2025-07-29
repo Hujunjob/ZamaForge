@@ -2,7 +2,9 @@
   "nav": {
     "home": "首页",
     "features": "功能",
-    "tokens": "代币"
+    "tokens": "代币",
+    "docs": "开发文档",
+    "beta": "Beta版本"
   },
   "hero": {
     "badge": "全同态加密区块链革命",
@@ -87,7 +89,9 @@
       "success": "转换成功",
       "convertedToEncrypted": "已将 {{amount}} {{symbol}} 转换为加密代币",
       "convertedToErc20": "已将 {{amount}} {{symbol}} 加密代币转换为ERC20代币",
-      "failed": "转换失败"
+      "failed": "转换失败",
+      "sdkInitFailed": "初始化SDK失败",
+      "unwrapFailed": "解包装失败"
     }
   },
   "transfer": {

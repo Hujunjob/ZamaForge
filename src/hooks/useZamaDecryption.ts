@@ -100,7 +100,7 @@ export const useZamaDecryption = () => {
       setState(prev => ({ 
         ...prev, 
         isDecrypting: false, 
-        error: '解密失败，请重试' 
+        error: 'Decryption failed, please try again' 
       }));
       
       // If decryption fails, return '0' instead of throwing error
