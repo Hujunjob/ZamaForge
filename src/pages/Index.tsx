@@ -133,8 +133,13 @@ const Index = () => {
   };
 
   const handleTransfer = async (tokenId: string, toAddress: string, amount: number) => {
+    console.log('🎯 handleTransfer被调用:', { tokenId, toAddress, amount });
+    
     const sourceToken = tokens.find(t => t.id === tokenId);
+    console.log('🔍 查找到的代币:', sourceToken);
+    
     if (!sourceToken) {
+      console.error('❌ 找不到代币信息');
       toast({
         title: "错误",
         description: "找不到代币信息",
@@ -144,6 +149,7 @@ const Index = () => {
     }
 
     if (!sourceToken.contractAddress) {
+      console.error('❌ 缺少代币合约地址');
       toast({
         title: "错误",
         description: "缺少代币合约地址",
@@ -155,16 +161,19 @@ const Index = () => {
     try {
       if (sourceToken.type === 'encrypted') {
         // 加密代币转账 - 使用 confidentialTransfer
+        console.log('🔐 开始加密代币转账流程');
         toast({
           title: "正在转账",
           description: "正在加密转账金额，请稍候..."
         });
 
-        await transferConfidential(
+        console.log('📞 调用transferConfidential...');
+        const result = await transferConfidential(
           sourceToken.contractAddress, 
           toAddress as `0x${string}`, 
           amount
         );
+        console.log('✅ transferConfidential调用完成:', result);
 
         toast({
           title: "转账成功",
@@ -187,16 +196,19 @@ const Index = () => {
 
       } else {
         // ERC20 代币转账 - 使用标准 transfer
+        console.log('💰 开始ERC20代币转账流程');
         toast({
           title: "正在转账",
           description: "正在发起ERC20转账，请确认交易..."
         });
 
-        await transferERC20(
+        console.log('📞 调用transferERC20...');
+        const result = await transferERC20(
           sourceToken.contractAddress, 
           toAddress as `0x${string}`, 
           amount
         );
+        console.log('✅ transferERC20调用完成:', result);
 
         toast({
           title: "转账成功", 

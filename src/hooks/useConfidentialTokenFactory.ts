@@ -276,26 +276,8 @@ export const useConfidentialTokenWrapper = (wrapperAddress: `0x${string}`) => {
     }
   };
 
-  // 加密转账
-  const confidentialTransfer = async (toAddress: `0x${string}`, encryptedAmount: string) => {
-    if (!address) throw new Error('钱包未连接');
-    
-    try {
-      writeContract({
-        address: wrapperAddress,
-        abi: wrapperAbi,
-        functionName: 'confidentialTransfer',
-        args: [toAddress, encryptedAmount],
-        chain: sepolia,
-        account: address,
-      });
-      
-      return hash;
-    } catch (error) {
-      console.error('加密转账失败:', error);
-      throw error;
-    }
-  };
+  // 注意：加密转账功能已移至 useTokenTransfer hook
+  // 这里不再提供 confidentialTransfer 方法，请使用 useTokenTransfer
 
   // 查询加密余额
   const { data: confidentialBalance } = useReadContract({
@@ -307,7 +289,6 @@ export const useConfidentialTokenWrapper = (wrapperAddress: `0x${string}`) => {
 
   return {
     unwrap,
-    confidentialTransfer,
     confidentialBalance,
     hash,
     isPending,
