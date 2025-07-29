@@ -46,11 +46,15 @@ export const Header = () => {
             </Badge>
             
             <div className="hidden md:flex items-center gap-2">
-              <Button variant="ghost" size="sm">
-                <Github className="h-4 w-4" />
+              <Button variant="ghost" size="sm" asChild>
+                <a href="https://github.com/Hujunjob/ZamaForge" target="_blank" rel="noopener noreferrer">
+                  <Github className="h-4 w-4" />
+                </a>
               </Button>
-              <Button variant="ghost" size="sm">
-                <Twitter className="h-4 w-4" />
+              <Button variant="ghost" size="sm" asChild>
+                <a href="https://x.com/ZForge23385" target="_blank" rel="noopener noreferrer">
+                  <Twitter className="h-4 w-4" />
+                </a>
               </Button>
             </div>
 

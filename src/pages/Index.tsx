@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useConfidentialTokenFactory } from "@/hooks/useConfidentialTokenFactory";
 import { useTokenTransfer } from "@/hooks/useTokenTransfer";
 import { useUnwrapToken } from "@/hooks/useUnwrapToken";
-import { readContract } from '@wagmi/core';
+import { readContract } from 'wagmi/actions';
 import { useConfig, useAccount } from 'wagmi';
 import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.json';
 import heroImage from "@/assets/hero-blockchain.jpg";
