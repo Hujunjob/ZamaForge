@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "features": "Fonctionnalités",
+    "tokens": "Jetons"
+  },
+  "hero": {
+    "badge": "Révolution de la Blockchain avec Chiffrement Homomorphe Complet",
+    "title": "Zama Forge",
+    "description": "Technologie révolutionnaire de chiffrement homomorphe complet pour une conversion transparente entre les jetons ERC20 et les jetons chiffrés",
+    "learnMore": "En Savoir Plus"
+  },
+  "features": {
+    "title": "Fonctionnalités Principales de Zama",
+    "subtitle": "Découvrez une protection de la vie privée blockchain sans précédent et une gestion de jetons avancée",
+    "erc20": {
+      "title": "Génération de Jetons ERC20",
+      "description": "Créez et déployez rapidement des jetons ERC20 personnalisés avec un support économique complet - lancez votre projet blockchain en un clic"
+    },
+    "conversion": {
+      "title": "Conversion Transparente de Jetons",
+      "description": "Convertissez instantanément entre jetons ERC20 et jetons chiffrés tout en maintenant une interopérabilité et liquidité complètes"
+    },
+    "encryption": {
+      "title": "Chiffrement Homomorphe Complet",
+      "description": "La technologie avancée de chiffrement homomorphe complet protège la confidentialité des données pendant le calcul, garantissant une sécurité absolue"
+    }
+  },
+  "tokens": {
+    "title": "Centre de Gestion des Jetons",
+    "subtitle": "Gérez Votre Royaume d'Actifs Numériques",
+    "clearCache": "Vider le Cache",
+    "all": "Tous les Jetons",
+    "erc20": "Jetons ERC20",
+    "encrypted": "Jetons Chiffrés",
+    "noErc20": "Aucun jeton ERC20",
+    "noEncrypted": "Aucun jeton chiffré"
+  },
+  "tokenCard": {
+    "balance": "Solde",
+    "contract": "Adresse du Contrat",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "show": "Afficher",
+    "hide": "Masquer",
+    "encrypted": "Solde du jeton chiffré, personne d'autre ne peut suivre le montant",
+    "convert": "Convertir",
+    "transfer": "Transférer",
+    "erc20Badge": "ERC20",
+    "encryptedBadge": "Chiffré"
+  },
+  "createToken": {
+    "title": "Créer un Jeton",
+    "button": "Créer un Nouveau Jeton",
+    "form": {
+      "tokenName": "Nom du Jeton",
+      "tokenSymbol": "Symbole du Jeton",
+      "initialSupply": "Approvisionnement Initial",
+      "cancel": "Annuler",
+      "create": "Créer le Jeton"
+    },
+    "messages": {
+      "creating": "Création du jeton, veuillez confirmer la transaction...",
+      "success": "Jeton créé avec succès !",
+      "error": "Échec de la création du jeton"
+    }
+  },
+  "convert": {
+    "title": "Convertir le Jeton",
+    "from": "De",
+    "to": "Vers",
+    "amount": "Montant",
+    "balance": "Solde",
+    "convert": "Convertir",
+    "cancel": "Annuler",
+    "toErc20": "Convertir en ERC20",
+    "toEncrypted": "Convertir en Chiffré",
+    "messages": {
+      "tokenNotFound": "Informations du jeton introuvables",
+      "insufficientBalance": "Solde de jeton insuffisant",
+      "missingContract": "Adresse de contrat manquante",
+      "missingEncryptedContract": "Adresse de contrat de jeton chiffré manquante",
+      "noCorrespondingErc20": "Aucun jeton ERC20 correspondant trouvé",
+      "converting": "Conversion en cours",
+      "convertingToEncrypted": "Conversion du jeton ERC20 en jeton chiffré, veuillez confirmer la transaction...",
+      "convertingToErc20": "Conversion du jeton chiffré en jeton ERC20, veuillez confirmer la transaction...",
+      "success": "Conversion réussie",
+      "convertedToEncrypted": "{{amount}} {{symbol}} convertis avec succès en jeton chiffré",
+      "convertedToErc20": "{{amount}} {{symbol}} jeton chiffré convertis avec succès en jeton ERC20",
+      "failed": "Échec de la conversion"
+    }
+  },
+  "transfer": {
+    "title": "Transférer le Jeton",
+    "to": "Adresse de Destination",
+    "amount": "Montant",
+    "balance": "Solde",
+    "transfer": "Transférer",
+    "cancel": "Annuler",
+    "messages": {
+      "tokenNotFound": "Informations du jeton introuvables",
+      "missingContract": "Adresse de contrat de jeton manquante",
+      "transferring": "Transfert en cours",
+      "encryptingAmount": "Chiffrement du montant de transfert, veuillez patienter...",
+      "initiatingErc20": "Initiation du transfert ERC20, veuillez confirmer la transaction...",
+      "success": "Transfert réussi",
+      "encryptedTransferSuccess": "{{amount}} {{symbol}} (chiffré(s)) transférés avec succès vers {{address}}",
+      "erc20TransferSuccess": "{{amount}} {{symbol}} transférés avec succès vers {{address}}",
+      "failed": "Échec du transfert"
+    }
+  },
+  "common": {
+    "error": "Erreur",
+    "success": "Succès",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "loading": "Chargement",
+    "unknownError": "Erreur inconnue",
+    "clearCacheConfirm": "Êtes-vous sûr de vouloir vider tout le cache des jetons ? Cela supprimera toutes les données de jetons stockées localement.",
+    "cacheCleared": "Cache vidé",
+    "cacheDescription": "Toutes les données de jetons stockées localement ont été supprimées"
+  },
+  "wallet": {
+    "notConnected": "Portefeuille non connecté",
+    "connectionError": "Erreur de connexion du portefeuille",
+    "airdropError": "Portefeuille non connecté ou impossible d'obtenir les frais d'airdrop"
+  }
+}

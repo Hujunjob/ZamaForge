@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 import { useZamaSDK } from '@/contexts/ZamaSDKContext';
+import { getWalletNotConnectedError } from '@/utils/errors';
 
 interface DecryptionState {
   isDecrypting: boolean;
@@ -22,7 +23,7 @@ export const useZamaDecryption = () => {
     contractAddress: string
   ): Promise<string> => {
     if (!address || !walletClient) {
-      throw new Error('钱包未连接');
+      throw new Error(getWalletNotConnectedError());
     }
 
     // Check if handle is zero (0x0000000000000000000000000000000000000000000000000000000000000000)

@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "home": "首页",
+    "features": "功能",
+    "tokens": "代币"
+  },
+  "hero": {
+    "badge": "全同态加密区块链革命",
+    "title": "Zama Forge",
+    "description": "革命性的全同态加密技术，实现ERC20代币与加密代币的无缝转换",
+    "learnMore": "了解更多"
+  },
+  "features": {
+    "title": "Zama 核心功能",
+    "subtitle": "体验前所未有的区块链隐私保护和代币管理功能",
+    "erc20": {
+      "title": "ERC20代币生成",
+      "description": "快速创建和部署自定义ERC20代币，支持完整的代币经济模型，一键启动您的区块链项目"
+    },
+    "conversion": {
+      "title": "无缝代币转换",
+      "description": "在ERC20代币和加密代币之间进行即时转换，保持完全的互操作性和流动性"
+    },
+    "encryption": {
+      "title": "全同态加密",
+      "description": "采用先进的全同态加密技术，在计算过程中保护数据隐私，确保绝对安全"
+    }
+  },
+  "tokens": {
+    "title": "代币管理中心",
+    "subtitle": "管理您的数字资产王国",
+    "clearCache": "清除缓存",
+    "all": "全部代币",
+    "erc20": "ERC20代币",
+    "encrypted": "加密代币",
+    "noErc20": "暂无ERC20代币",
+    "noEncrypted": "暂无加密代币"
+  },
+  "tokenCard": {
+    "balance": "余额",
+    "contract": "合约地址",
+    "copy": "复制",
+    "copied": "已复制！",
+    "show": "显示",
+    "hide": "隐藏",
+    "encrypted": "代币数量加密，其他任何人无法追踪数量",
+    "convert": "转换",
+    "transfer": "转账",
+    "erc20Badge": "ERC20",
+    "encryptedBadge": "加密"
+  },
+  "createToken": {
+    "title": "创建代币",
+    "button": "创建新代币",
+    "form": {
+      "tokenName": "代币名称",
+      "tokenSymbol": "代币符号",
+      "initialSupply": "初始供应量",
+      "cancel": "取消",
+      "create": "创建代币"
+    },
+    "messages": {
+      "creating": "正在创建代币，请确认交易...",
+      "success": "代币创建成功！",
+      "error": "代币创建失败"
+    }
+  },
+  "convert": {
+    "title": "转换代币",
+    "from": "从",
+    "to": "到",
+    "amount": "数量",
+    "balance": "余额",
+    "convert": "转换",
+    "cancel": "取消",
+    "toErc20": "转换为ERC20",
+    "toEncrypted": "转换为加密",
+    "messages": {
+      "tokenNotFound": "找不到代币信息",
+      "insufficientBalance": "代币余额不足",
+      "missingContract": "缺少合约地址",
+      "missingEncryptedContract": "缺少加密代币合约地址",
+      "noCorrespondingErc20": "找不到对应的ERC20代币",
+      "converting": "正在转换",
+      "convertingToEncrypted": "正在将ERC20代币转换为加密代币，请确认交易...",
+      "convertingToErc20": "正在将加密代币转换为ERC20代币，请确认交易...",
+      "success": "转换成功",
+      "convertedToEncrypted": "已将 {{amount}} {{symbol}} 转换为加密代币",
+      "convertedToErc20": "已将 {{amount}} {{symbol}} 加密代币转换为ERC20代币",
+      "failed": "转换失败"
+    }
+  },
+  "transfer": {
+    "title": "转账代币",
+    "to": "接收地址",
+    "amount": "数量",
+    "balance": "余额",
+    "transfer": "转账",
+    "cancel": "取消",
+    "messages": {
+      "tokenNotFound": "找不到代币信息",
+      "missingContract": "缺少代币合约地址",
+      "transferring": "正在转账",
+      "encryptingAmount": "正在加密转账金额，请稍候...",
+      "initiatingErc20": "正在发起ERC20转账，请确认交易...",
+      "success": "转账成功",
+      "encryptedTransferSuccess": "已向 {{address}} 转账 {{amount}} {{symbol}}（加密）",
+      "erc20TransferSuccess": "已向 {{address}} 转账 {{amount}} {{symbol}}",
+      "failed": "转账失败"
+    }
+  },
+  "common": {
+    "error": "错误",
+    "success": "成功",
+    "confirm": "确认",
+    "cancel": "取消",
+    "loading": "加载中",
+    "unknownError": "未知错误",
+    "clearCacheConfirm": "确定要清除所有代币缓存吗？这将删除所有本地存储的代币数据。",
+    "cacheCleared": "缓存已清除",
+    "cacheDescription": "所有本地存储的代币数据已删除"
+  },
+  "wallet": {
+    "notConnected": "钱包未连接",
+    "connectionError": "钱包连接错误",
+    "airdropError": "钱包未连接或无法获取空投费用"
+  }
+}

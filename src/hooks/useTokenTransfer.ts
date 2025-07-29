@@ -5,6 +5,7 @@ import { sepolia } from 'wagmi/chains';
 import { useZamaSDK } from '@/contexts/ZamaSDKContext';
 import ConfidentialTokenWrapperABI from '../../abis/ConfidentialTokenWrapper.json';
 import TestCoinABI from '../../abis/TestCoin.json';
+import { getWalletNotConnectedError } from '@/utils/errors';
 
 // Type assertions for ABIs
 const wrapperAbi = ConfidentialTokenWrapperABI as any;
@@ -41,7 +42,7 @@ export const useTokenTransfer = () => {
     
     if (!address) {
       console.error('❌ 钱包未连接');
-      throw new Error('钱包未连接');
+      throw new Error(getWalletNotConnectedError());
     }
     
     try {
@@ -93,7 +94,7 @@ export const useTokenTransfer = () => {
     
     if (!address) {
       console.error('❌ 钱包未连接');
-      throw new Error('钱包未连接');
+      throw new Error(getWalletNotConnectedError());
     }
     
     // Set encrypting state immediately and synchronously

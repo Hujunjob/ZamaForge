@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +20,7 @@ import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.jso
 import heroImage from "@/assets/hero-blockchain.jpg";
 
 const Index = () => {
+  const { t } = useTranslation();
   const { tokens, addToken, updateToken, clearAllTokens, erc20Tokens, encryptedTokens } = useTokens();
   const { toast } = useToast();
   const { wrapERC20, isPending: isWrapping, isConfirmed, error: wrapError } = useConfidentialTokenFactory();
@@ -43,8 +45,8 @@ const Index = () => {
     
     if (!sourceToken) {
       toast({
-        title: "错误",
-        description: "找不到代币信息",
+        title: t('common.error'),
+        description: t('convert.messages.tokenNotFound'),
         variant: "destructive"
       });
       return;
@@ -57,8 +59,8 @@ const Index = () => {
     
     if (actualBalance < amount) {
       toast({
-        title: "错误",
-        description: "代币余额不足",
+        title: t('common.error'),
+        description: t('convert.messages.insufficientBalance'),
         variant: "destructive"
       });
       return;
@@ -81,7 +83,7 @@ const Index = () => {
           description: "正在将ERC20代币转换为加密代币，请确认交易..."
         });
 
-        await wrapERC20(sourceToken.contractAddress, amount);
+        await wrapERC20(sourceToken.contractAddress as `0x${string}`, amount);
         
         // 获取真实的加密代币合约地址
         const confidentialTokenAddress = await readContract(config, {
@@ -257,7 +259,7 @@ const Index = () => {
 
         console.log('📞 调用transferConfidential...');
         const result = await transferConfidential(
-          sourceToken.contractAddress, 
+          sourceToken.contractAddress as `0x${string}`, 
           toAddress as `0x${string}`, 
           amount
         );
@@ -292,7 +294,7 @@ const Index = () => {
 
         console.log('📞 调用transferERC20...');
         const result = await transferERC20(
-          sourceToken.contractAddress, 
+          sourceToken.contractAddress as `0x${string}`, 
           toAddress as `0x${string}`, 
           amount
         );
@@ -319,11 +321,11 @@ const Index = () => {
   };
 
   const handleClearCache = () => {
-    if (confirm('确定要清除所有代币缓存吗？这将删除所有本地存储的代币数据。')) {
+    if (confirm(t('common.clearCacheConfirm'))) {
       clearAllTokens();
       toast({
-        title: "缓存已清除",
-        description: "所有本地存储的代币数据已删除",
+        title: t('common.cacheCleared'),
+        description: t('common.cacheDescription'),
       });
     }
   };
@@ -355,23 +357,21 @@ const Index = () => {
           <div className="max-w-5xl mx-auto space-y-12">
             <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-card border-2 border-primary/30 text-primary shadow-card backdrop-blur-sm">
               <Sparkles className="h-5 w-5" />
-              <span className="text-sm font-bold tracking-wide">全同态加密区块链革命</span>
+              <span className="text-sm font-bold tracking-wide">{t('hero.badge')}</span>
             </div>
             
             <h1 className="text-6xl md:text-8xl font-black bg-gradient-hero bg-clip-text text-transparent animate-gradient-shift bg-[length:300%_300%] tracking-tight">
-              Zama Forge
+              {t('hero.title')}
             </h1>
             
             <p className="text-2xl md:text-3xl text-foreground/90 max-w-4xl mx-auto leading-relaxed font-medium">
-              <span className="bg-gradient-primary bg-clip-text text-transparent">革命性</span>的全同态加密技术，实现
-              <span className="text-primary-glow font-bold">ERC20代币</span>与
-              <span className="text-primary-glow font-bold">加密代币</span>的无缝转换
+              {t('hero.description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
               <CreateTokenDialog />
               <Button variant="outline" size="lg" className="group">
-                <span>了解更多</span>
+                <span>{t('hero.learnMore')}</span>
                 <Sparkles className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -388,10 +388,10 @@ const Index = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-black mb-6 bg-gradient-primary bg-clip-text text-transparent">
-              Zama 核心功能
+              {t('features.title')}
             </h2>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto font-medium">
-              体验前所未有的区块链隐私保护和代币管理功能
+              {t('features.subtitle')}
             </p>
           </div>
           
@@ -403,12 +403,12 @@ const Index = () => {
                   <Coins className="h-8 w-8 text-primary-foreground" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow">
-                  ERC20代币生成
+                  {t('features.erc20.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10 pb-8">
                 <CardDescription className="text-center text-lg text-foreground/70 leading-relaxed">
-                  快速创建和部署自定义ERC20代币，支持完整的代币经济模型，一键启动您的区块链项目
+                  {t('features.erc20.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -420,12 +420,12 @@ const Index = () => {
                   <ArrowLeftRight className="h-8 w-8 text-primary-foreground" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow">
-                  无缝代币转换
+                  {t('features.conversion.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10 pb-8">
                 <CardDescription className="text-center text-lg text-foreground/70 leading-relaxed">
-                  在ERC20代币和加密代币之间进行即时转换，保持完全的互操作性和流动性
+                  {t('features.conversion.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -437,12 +437,12 @@ const Index = () => {
                   <Shield className="h-8 w-8 text-primary-foreground" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground group-hover:text-primary-glow">
-                  全同态加密
+                  {t('features.encryption.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative z-10 pb-8">
                 <CardDescription className="text-center text-lg text-foreground/70 leading-relaxed">
-                  采用先进的全同态加密技术，在计算过程中保护数据隐私，确保绝对安全
+                  {t('features.encryption.description')}
                 </CardDescription>
               </CardContent>
             </Card>
@@ -457,21 +457,21 @@ const Index = () => {
           <div className="text-center mb-20">
             <div className="flex items-center justify-center gap-4 mb-6">
               <h2 className="text-4xl md:text-6xl font-black bg-gradient-primary bg-clip-text text-transparent">
-                代币管理中心
+                {t('tokens.title')}
               </h2>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={handleClearCache}
                 className="ml-4 text-red-500 border-red-500/30 hover:bg-red-500/10 hover:border-red-500"
-                title="清除所有代币缓存"
+                title={t('tokens.clearCache')}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                清除缓存
+                {t('tokens.clearCache')}
               </Button>
             </div>
             <p className="text-xl md:text-2xl text-foreground/80 font-medium">
-              管理您的数字资产王国
+              {t('tokens.subtitle')}
             </p>
           </div>
 
@@ -479,15 +479,15 @@ const Index = () => {
             <TabsList className="grid w-full grid-cols-3 mb-12 h-16 bg-gradient-card border-2 border-primary/20 shadow-card backdrop-blur-sm">
               <TabsTrigger value="all" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                 <Zap className="h-5 w-5" />
-                全部代币
+                {t('tokens.all')}
               </TabsTrigger>
               <TabsTrigger value="erc20" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                 <Coins className="h-5 w-5" />
-                ERC20代币
+                {t('tokens.erc20')}
               </TabsTrigger>
               <TabsTrigger value="encrypted" className="flex items-center gap-3 text-lg font-medium data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
                 <Lock className="h-5 w-5" />
-                加密代币
+                {t('tokens.encrypted')}
               </TabsTrigger>
             </TabsList>
 
@@ -520,7 +520,7 @@ const Index = () => {
               {erc20Tokens.length === 0 && (
                 <div className="text-center py-12">
                   <Coins className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">暂无ERC20代币</p>
+                  <p className="text-muted-foreground">{t('tokens.noErc20')}</p>
                 </div>
               )}
             </TabsContent>
@@ -540,7 +540,7 @@ const Index = () => {
               {encryptedTokens.length === 0 && (
                 <div className="text-center py-12">
                   <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">暂无加密代币</p>
+                  <p className="text-muted-foreground">{t('tokens.noEncrypted')}</p>
                 </div>
               )}
             </TabsContent>

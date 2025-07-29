@@ -1,5 +1,6 @@
 import { useAccount, useWriteContract, useReadContract } from 'wagmi';
 import AirdropABI from '../../abis/Airdrop.json';
+import { getAirdropError } from '@/utils/errors';
 
 // Airdrop合约地址（来自README.md）
 const AIRDROP_CONTRACT_ADDRESS = '0x6dB435EFe22787b6CC4E0DDAb8a6281a8a6E04F1';
@@ -41,7 +42,7 @@ export const useAirdrop = () => {
 
   const claimTokens = async () => {
     if (!address || !claimFee) {
-      throw new Error('钱包未连接或无法获取空投费用');
+      throw new Error(getAirdropError());
     }
 
     try {

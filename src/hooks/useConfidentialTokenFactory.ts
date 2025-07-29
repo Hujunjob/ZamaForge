@@ -6,6 +6,7 @@ import { sepolia } from 'wagmi/chains';
 import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.json';
 import ConfidentialTokenWrapperABI from '../../abis/ConfidentialTokenWrapper.json';
 import TestCoinABI from '../../abis/TestCoin.json';
+import { getWalletNotConnectedError } from '@/utils/errors';
 
 // Type assertions for ABIs
 const factoryAbi = ConfidentialTokenFactoryABI as any;
@@ -29,7 +30,7 @@ export const useConfidentialTokenFactory = () => {
 
   // 授权ERC20代币给factory合约
   const approveERC20 = async (erc20Address: `0x${string}`, amount: number) => {
-    if (!address) throw new Error('钱包未连接');
+    if (!address) throw new Error(getWalletNotConnectedError());
     
     try {
       const amountInWei = parseEther(amount.toString());
@@ -52,7 +53,7 @@ export const useConfidentialTokenFactory = () => {
 
   // 包装ERC20代币为加密代币（自动处理授权）
   const wrapERC20WithApproval = async (erc20Address: `0x${string}`, amount: number) => {
-    if (!address) throw new Error('钱包未连接');
+    if (!address) throw new Error(getWalletNotConnectedError());
     
     try {
       setCurrentStep('checking');
@@ -110,7 +111,7 @@ export const useConfidentialTokenFactory = () => {
 
   // 包装ERC20代币为加密代币（自动处理授权）
   const wrapERC20 = async (erc20Address: `0x${string}`, amount: number) => {
-    if (!address) throw new Error('钱包未连接');
+    if (!address) throw new Error(getWalletNotConnectedError());
     
     try {
       setCurrentStep('checking');
@@ -257,7 +258,7 @@ export const useConfidentialTokenWrapper = (wrapperAddress: `0x${string}`) => {
 
   // 解包装加密代币为普通代币 (需要加密金额)
   const unwrapWithEncryption = async (toAddress: `0x${string}`, amount: number, zamaSDK: any) => {
-    if (!address) throw new Error('钱包未连接');
+    if (!address) throw new Error(getWalletNotConnectedError());
     
     try {
       console.log('🔐 开始解包装加密代币:', { wrapperAddress, toAddress, amount, address });

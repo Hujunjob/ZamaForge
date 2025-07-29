@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Send, Shield, Coins } from "lucide-react";
 import { Token } from "@/hooks/useTokens";
+import { useTranslation } from 'react-i18next';
 
 // 格式化代币余额显示
 const formatTokenBalance = (balance: string | number, decimals: number = 18, symbol: string, isRawValue: boolean = false) => {
@@ -33,6 +34,7 @@ interface TransferDialogProps {
 }
 
 export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransferring = false, isEncrypting = false }: TransferDialogProps) => {
+  const { t } = useTranslation();
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [localProcessing, setLocalProcessing] = useState(false);
@@ -72,8 +74,8 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
     if (!toAddress || !toAddress.startsWith('0x') || toAddress.length !== 42) {
       console.log('❌ 地址验证失败:', toAddress);
       toast({
-        title: "错误",
-        description: "请输入有效的以太坊地址",
+        title: t('common.error'),
+        description: t('common.error'),
         variant: "destructive"
       });
       return;
@@ -81,8 +83,8 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
     
     if (!transferAmount || transferAmount <= 0) {
       toast({
-        title: "错误",
-        description: "请输入有效的转账数量",
+        title: t('common.error'),
+        description: t('common.error'),
         variant: "destructive"
       });
       return;
@@ -90,8 +92,8 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
 
     if (transferAmount > getActualBalance()) {
       toast({
-        title: "错误", 
-        description: "转账数量不能超过余额",
+        title: t('common.error'), 
+        description: t('transfer.messages.insufficientBalance'),
         variant: "destructive"
       });
       return;
@@ -123,14 +125,14 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Send className="h-5 w-5" />
-            {token.type === 'encrypted' ? '私密转账' : 'ERC20转账'}
+            {t('transfer.title')}
           </DialogTitle>
           <DialogDescription>
-            发送 {token.name} ({token.symbol}) 到指定地址
+            {t('transfer.to')} {token.name} ({token.symbol})
             {token.type === 'encrypted' && (
               <div className="mt-2 text-sm text-primary bg-primary/5 border border-primary/20 rounded p-2">
                 <Shield className="h-3 w-3 inline mr-1" />
-                加密代币转账，金额完全保密
+                {t('tokenCard.encrypted')}
               </div>
             )}
           </DialogDescription>
@@ -146,14 +148,14 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
               <div>
                 <p className="font-medium">{token.name}</p>
                 <p className="text-sm text-muted-foreground">
-                  可用余额: {getDisplayBalance()}
+                  {t('transfer.balance')}: {getDisplayBalance()}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="toAddress">接收地址</Label>
+            <Label htmlFor="toAddress">{t('transfer.to')}</Label>
             <Input
               id="toAddress"
               placeholder="0x..."
@@ -163,11 +165,11 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">转账数量</Label>
+            <Label htmlFor="amount">{t('transfer.amount')}</Label>
             <Input
               id="amount"
               type="number"
-              placeholder={`输入要转账的 ${token.symbol} 数量`}
+              placeholder={`${t('transfer.amount')} ${token.symbol}`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               max={getActualBalance()}
@@ -181,7 +183,7 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
               onClick={() => onOpenChange(false)} 
               className="flex-1"
             >
-              取消
+              {t('common.cancel')}
             </Button>
             <Button 
               onClick={handleTransfer} 
@@ -190,10 +192,10 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
               disabled={isTransferring || isEncrypting || localProcessing}
             >
               <Send className="h-4 w-4 mr-2" />
-              {localProcessing ? (token.type === 'encrypted' ? '加密中...' : '转账中...') : 
-               isEncrypting ? '加密中...' : 
-               isTransferring ? '转账中...' : 
-               '确认转账'}
+              {localProcessing ? (token.type === 'encrypted' ? t('common.loading') + '...' : t('transfer.messages.transferring') + '...') : 
+               isEncrypting ? t('common.loading') + '...' : 
+               isTransferring ? t('transfer.messages.transferring') + '...' : 
+               t('transfer.transfer')}
             </Button>
           </div>
         </div>

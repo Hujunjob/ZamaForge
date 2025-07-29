@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Zap, Menu, Github, Twitter } from "lucide-react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export const Header = () => {
+  const { t } = useTranslation();
+  
   return (
     <header className="fixed top-0 left-0 right-0 z-50 header-blur">
       <div className="container mx-auto px-4">
@@ -17,17 +21,17 @@ export const Header = () => {
               <h1 className="text-xl font-black bg-gradient-hero bg-clip-text text-transparent">
                 Zama Forge
               </h1>
-              <p className="text-xs text-muted-foreground -mt-0.5">全同态加密平台</p>
+              <p className="text-xs text-muted-foreground -mt-0.5">{t('hero.badge')}</p>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-foreground/80 hover:text-primary">
-              功能特性
+              {t('nav.features')}
             </a>
             <a href="#tokens" className="text-foreground/80 hover:text-primary">
-              代币管理
+              {t('nav.tokens')}
             </a>
             <a href="#docs" className="text-foreground/80 hover:text-primary">
               开发文档
@@ -49,6 +53,8 @@ export const Header = () => {
                 <Twitter className="h-4 w-4" />
               </Button>
             </div>
+
+            <LanguageSwitcher />
 
             <div className="hidden sm:flex">
               <ConnectButton />

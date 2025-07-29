@@ -3,6 +3,7 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagm
 import { sepolia } from 'wagmi/chains';
 import { useZamaSDK } from '@/contexts/ZamaSDKContext';
 import ConfidentialTokenWrapperABI from '../../abis/ConfidentialTokenWrapper.json';
+import { getWalletNotConnectedError } from '@/utils/errors';
 
 // Type assertions for ABIs
 const wrapperAbi = ConfidentialTokenWrapperABI as any;
@@ -37,7 +38,7 @@ export const useUnwrapToken = () => {
     console.log('🔓 开始解包装加密代币:', { wrapperAddress, toAddress, amount, address });
     
     if (!address) {
-      throw new Error('钱包未连接');
+      throw new Error(getWalletNotConnectedError());
     }
     
     // Set encrypting state immediately and synchronously

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { ArrowUpDown, Shield, Coins } from "lucide-react";
 import { Token } from "@/hooks/useTokens";
+import { useTranslation } from 'react-i18next';
 
 // 格式化代币余额显示
 const formatTokenBalance = (balance: string | number, decimals: number = 18, symbol: string, isRawValue: boolean = false) => {
@@ -32,6 +33,7 @@ interface ConvertDialogProps {
 }
 
 export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading = false }: ConvertDialogProps) => {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const [isConverting, setIsConverting] = useState(false);
   const { toast } = useToast();
@@ -62,8 +64,8 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
     
     if (!convertAmount || convertAmount <= 0) {
       toast({
-        title: "错误",
-        description: "请输入有效的转换数量",
+        title: t('common.error'),
+        description: t('common.error'),
         variant: "destructive"
       });
       return;
@@ -71,8 +73,8 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
 
     if (convertAmount > getActualBalance()) {
       toast({
-        title: "错误", 
-        description: "转换数量不能超过余额",
+        title: t('common.error'), 
+        description: t('convert.messages.insufficientBalance'),
         variant: "destructive"
       });
       return;
@@ -97,10 +99,10 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowUpDown className="h-5 w-5" />
-            代币转换
+            {t('convert.title')}
           </DialogTitle>
           <DialogDescription>
-            将 {token.name} 从 {token.type === 'erc20' ? 'ERC20代币' : '加密代币'} 转换为 {targetType === 'erc20' ? 'ERC20代币' : '加密代币'}
+            {t('convert.from')} {token.name} {token.type === 'erc20' ? t('tokens.erc20') : t('tokens.encrypted')} {t('convert.to')} {targetType === 'erc20' ? t('tokens.erc20') : t('tokens.encrypted')}
           </DialogDescription>
         </DialogHeader>
         
@@ -113,7 +115,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
               }
               <div>
                 <p className="font-medium">{token.name}</p>
-                <p className="text-sm text-muted-foreground">当前余额: {getDisplayBalance()}</p>
+                <p className="text-sm text-muted-foreground">{t('convert.balance')}: {getDisplayBalance()}</p>
               </div>
             </div>
           </div>
@@ -130,17 +132,17 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
               }
               <div>
                 <p className="font-medium">{token.name}</p>
-                <p className="text-sm text-muted-foreground">{targetType === 'encrypted' ? '加密代币' : 'ERC20代币'}</p>
+                <p className="text-sm text-muted-foreground">{targetType === 'encrypted' ? t('tokens.encrypted') : t('tokens.erc20')}</p>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">转换数量</Label>
+            <Label htmlFor="amount">{t('convert.amount')}</Label>
             <Input
               id="amount"
               type="number"
-              placeholder={`输入要转换的 ${token.symbol} 数量`}
+              placeholder={`${t('convert.amount')} ${token.symbol}`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               max={getActualBalance()}
@@ -154,7 +156,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
               onClick={() => onOpenChange(false)} 
               className="flex-1"
             >
-              取消
+              {t('common.cancel')}
             </Button>
             <Button 
               onClick={handleConvert} 
@@ -162,7 +164,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
               className="flex-1"
               disabled={isConverting || isLoading}
             >
-              {isConverting || isLoading ? "转换中..." : "确认转换"}
+              {isConverting || isLoading ? t('common.loading') + '...' : t('convert.convert')}
             </Button>
           </div>
         </div>

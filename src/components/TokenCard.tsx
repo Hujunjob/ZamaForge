@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Token } from "@/hooks/useTokens";
 import { useZamaDecryption } from "@/hooks/useZamaDecryption";
 import { useConfidentialTokenWrapper } from "@/hooks/useConfidentialTokenFactory";
+import { useTranslation } from 'react-i18next';
 
 // 格式化代币余额，处理小数位
 const formatTokenBalance = (balance: string | number, decimals: number = 18, symbol: string, isRawValue: boolean = false) => {
@@ -36,6 +37,7 @@ interface TokenCardProps {
 }
 
 export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: TokenCardProps) => {
+  const { t } = useTranslation();
   const [isBalanceVisible, setIsBalanceVisible] = useState(
     !token.isBalanceEncrypted || !!token.decryptedBalance
   );
@@ -54,13 +56,13 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        title: "已复制",
-        description: "合约地址已复制到剪贴板",
+        title: t('tokenCard.copied'),
+        description: t('tokenCard.copied'),
       });
     } catch (error) {
       toast({
-        title: "复制失败",
-        description: "无法复制到剪贴板",
+        title: t('common.error'),
+        description: t('common.error'),
         variant: "destructive",
       });
     }
@@ -74,8 +76,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
         // 需要先解密余额
         if (!confidentialBalance || !token.contractAddress) {
           toast({
-            title: "解密失败",
-            description: "无法获取加密余额数据",
+            title: t('common.error'),
+            description: t('common.error'),
             variant: "destructive",
           });
           return;
@@ -83,8 +85,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
 
         // 显示解密中提示
         toast({
-          title: "解密中...",
-          description: "正在解密代币余额，请稍候",
+          title: t('common.loading'),
+          description: t('common.loading'),
         });
 
         try {
@@ -105,8 +107,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
           // 只有成功解密且不是零值时才显示成功提示
           if (decrypted !== '0') {
             toast({
-              title: "解密成功",
-              description: "余额已解密显示",
+              title: t('common.success'),
+              description: t('common.success'),
             });
           }
         } catch (error) {
@@ -165,14 +167,14 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
                 : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-glow'
             }`}
           >
-            {token.type === 'erc20' ? 'ERC20' : '加密'}
+            {token.type === 'erc20' ? t('tokenCard.erc20Badge') : t('tokenCard.encryptedBadge')}
           </Badge>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-6 relative z-10">
         <div className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-primary/10">
-          <span className="text-base text-foreground/70 font-medium">余额</span>
+          <span className="text-base text-foreground/70 font-medium">{t('tokenCard.balance')}</span>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-black text-foreground bg-gradient-primary bg-clip-text text-transparent">
               {token.isBalanceEncrypted ? (
@@ -182,7 +184,7 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
                   formatTokenBalance(decryptedBalance, token.decimals || 18, token.symbol, true)
                 ) : isBalanceVisible ? (
                   // 正在解密中，显示loading或隐藏状态
-                  isDecrypting ? '解密中...' : '••••••••'
+                  isDecrypting ? t('common.loading') + '...' : '••••••••'
                 ) : (
                   // 未解密，显示隐藏状态
                   '••••••••'
@@ -219,13 +221,13 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
         {token.isBalanceEncrypted && (
           <div className="text-sm text-muted-foreground bg-primary/5 border border-primary/20 rounded-lg p-3">
             <Shield className="h-4 w-4 inline mr-2" />
-            代币数量加密，其他任何人无法追踪数量
+            {t('tokenCard.encrypted')}
           </div>
         )}
         
         {token.contractAddress && (
           <div className="space-y-2">
-            <span className="text-sm text-foreground/70 font-medium">合约地址</span>
+            <span className="text-sm text-foreground/70 font-medium">{t('tokenCard.contract')}</span>
             <div className="flex items-center gap-2 text-xs text-foreground/60 font-mono bg-muted/50 px-3 py-2 rounded-lg border border-primary/10">
               <span className="flex-1">{token.contractAddress}</span>
               <Button
@@ -248,7 +250,7 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
             className="flex-1 h-12 text-base font-bold"
           >
             <ArrowLeftRight className="h-5 w-5 mr-2" />
-            转换
+            {t('tokenCard.convert')}
           </Button>
           {onTransfer && (
             <Button 
@@ -258,7 +260,7 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
               className="flex-1 h-12 text-base font-bold border-primary/30 hover:bg-primary/10"
             >
               <Send className="h-5 w-5 mr-2" />
-              转账
+              {t('tokenCard.transfer')}
             </Button>
           )}
         </div>

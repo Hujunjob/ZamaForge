@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "tokens": "Tokens"
+  },
+  "hero": {
+    "badge": "Fully Homomorphic Encryption Blockchain Revolution",
+    "title": "Zama Forge",
+    "description": "Revolutionary fully homomorphic encryption technology for seamless conversion between ERC20 tokens and encrypted tokens",
+    "learnMore": "Learn More"
+  },
+  "features": {
+    "title": "Zama Core Features",
+    "subtitle": "Experience unprecedented blockchain privacy protection and token management",
+    "erc20": {
+      "title": "ERC20 Token Generation",
+      "description": "Quickly create and deploy custom ERC20 tokens with full token economy support - launch your blockchain project with one click"
+    },
+    "conversion": {
+      "title": "Seamless Token Conversion",
+      "description": "Instantly convert between ERC20 tokens and encrypted tokens while maintaining complete interoperability and liquidity"
+    },
+    "encryption": {
+      "title": "Fully Homomorphic Encryption",
+      "description": "Advanced fully homomorphic encryption technology protects data privacy during computation, ensuring absolute security"
+    }
+  },
+  "tokens": {
+    "title": "Token Management Center",
+    "subtitle": "Manage Your Digital Asset Kingdom",
+    "clearCache": "Clear Cache",
+    "all": "All Tokens",
+    "erc20": "ERC20 Tokens",
+    "encrypted": "Encrypted Tokens",
+    "noErc20": "No ERC20 tokens",
+    "noEncrypted": "No encrypted tokens"
+  },
+  "tokenCard": {
+    "balance": "Balance",
+    "contract": "Contract Address",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "show": "Show",
+    "hide": "Hide",
+    "encrypted": "Token balance encrypted, no one else can track the amount",
+    "convert": "Convert",
+    "transfer": "Transfer",
+    "erc20Badge": "ERC20",
+    "encryptedBadge": "Encrypted"
+  },
+  "createToken": {
+    "title": "Create Token",
+    "button": "Create New Token",
+    "form": {
+      "tokenName": "Token Name",
+      "tokenSymbol": "Token Symbol",
+      "initialSupply": "Initial Supply",
+      "cancel": "Cancel",
+      "create": "Create Token"
+    },
+    "messages": {
+      "creating": "Creating token, please confirm transaction...",
+      "success": "Token created successfully!",
+      "error": "Token creation failed"
+    }
+  },
+  "convert": {
+    "title": "Convert Token",
+    "from": "From",
+    "to": "To",
+    "amount": "Amount",
+    "balance": "Balance",
+    "convert": "Convert",
+    "cancel": "Cancel",
+    "toErc20": "Convert to ERC20",
+    "toEncrypted": "Convert to Encrypted",
+    "messages": {
+      "tokenNotFound": "Token information not found",
+      "insufficientBalance": "Insufficient token balance",
+      "missingContract": "Missing contract address",
+      "missingEncryptedContract": "Missing encrypted token contract address",
+      "noCorrespondingErc20": "No corresponding ERC20 token found",
+      "converting": "Converting",
+      "convertingToEncrypted": "Converting ERC20 token to encrypted token, please confirm transaction...",
+      "convertingToErc20": "Converting encrypted token to ERC20 token, please confirm transaction...",
+      "success": "Conversion successful",
+      "convertedToEncrypted": "Successfully converted {{amount}} {{symbol}} to encrypted token",
+      "convertedToErc20": "Successfully converted {{amount}} {{symbol}} encrypted token to ERC20 token",
+      "failed": "Conversion failed"
+    }
+  },
+  "transfer": {
+    "title": "Transfer Token",
+    "to": "To Address",
+    "amount": "Amount",
+    "balance": "Balance",
+    "transfer": "Transfer",
+    "cancel": "Cancel",
+    "messages": {
+      "tokenNotFound": "Token information not found",
+      "missingContract": "Missing token contract address",
+      "transferring": "Transferring",
+      "encryptingAmount": "Encrypting transfer amount, please wait...",
+      "initiatingErc20": "Initiating ERC20 transfer, please confirm transaction...",
+      "success": "Transfer successful",
+      "encryptedTransferSuccess": "Successfully transferred {{amount}} {{symbol}} (encrypted) to {{address}}",
+      "erc20TransferSuccess": "Successfully transferred {{amount}} {{symbol}} to {{address}}",
+      "failed": "Transfer failed"
+    }
+  },
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "loading": "Loading",
+    "unknownError": "Unknown error",
+    "clearCacheConfirm": "Are you sure you want to clear all token cache? This will delete all locally stored token data.",
+    "cacheCleared": "Cache cleared",
+    "cacheDescription": "All locally stored token data has been deleted"
+  },
+  "wallet": {
+    "notConnected": "Wallet not connected",
+    "connectionError": "Wallet connection error",
+    "airdropError": "Wallet not connected or unable to get airdrop fee"
+  }
+}
