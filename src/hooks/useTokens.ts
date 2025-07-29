@@ -11,6 +11,7 @@ export interface Token {
   type: 'erc20' | 'encrypted';
   contractAddress?: string;
   isBalanceEncrypted?: boolean;
+  decimals?: number; // 代币小数位数，默认18
 }
 
 const STORAGE_KEY = 'zamaforge_tokens';
@@ -75,6 +76,7 @@ export const useTokens = () => {
           type: 'encrypted',
           contractAddress: confidentialTokenAddress as string,
           isBalanceEncrypted: true,
+          decimals: 6, // 加密代币使用6位小数
         };
 
         // Check if confidential ZamaForge token already exists

@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftRight, Coins, Shield, Eye, EyeOff, Copy, Send } from "lucide-react";
+import { ArrowLeftRight, Coins, Shield, Eye, EyeOff, Copy, Send, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Token } from "@/hooks/useTokens";
+import { useZamaDecryption } from "@/hooks/useZamaDecryption";
+import { useConfidentialTokenWrapper } from "@/hooks/useConfidentialTokenFactory";
+
+// 格式化代币余额，处理小数位
+const formatTokenBalance = (balance: string | number, decimals: number = 18, symbol: string, isRawValue: boolean = false) => {
+  const balanceNum = typeof balance === 'string' ? Number(balance) : balance;
+  
+  let actualBalance = balanceNum;
+  
+  // 只有当是原始值时才需要除以divisor进行转换
+  if (isRawValue) {
+    const divisor = Math.pow(10, decimals);
+    actualBalance = balanceNum / divisor;
+  }
+  
+  // 格式化显示，最多显示6位小数
+  const formattedBalance = actualBalance.toFixed(decimals <= 6 ? decimals : 6);
+  
+  // 移除末尾的0
+  const cleanedBalance = parseFloat(formattedBalance).toString();
+  return `${parseFloat(cleanedBalance).toLocaleString()} ${symbol}`;
+};
 
 interface TokenCardProps {
   token: Token;
@@ -14,7 +36,14 @@ interface TokenCardProps {
 
 export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState(!token.isBalanceEncrypted);
+  const [decryptedBalance, setDecryptedBalance] = useState<string | null>(null);
   const { toast } = useToast();
+  const { decryptBalance, isDecrypting, error: decryptError } = useZamaDecryption();
+  
+  // Get confidential balance handle for encrypted tokens
+  const { confidentialBalance } = useConfidentialTokenWrapper(
+    token.contractAddress as `0x${string}` || '0x0000000000000000000000000000000000000000'
+  );
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -32,8 +61,39 @@ export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
     }
   };
 
-  const toggleBalanceVisibility = () => {
-    setIsBalanceVisible(!isBalanceVisible);
+  const toggleBalanceVisibility = async () => {
+    if (token.isBalanceEncrypted && !isBalanceVisible && !decryptedBalance) {
+      // Need to decrypt the balance first
+      if (!confidentialBalance || !token.contractAddress) {
+        toast({
+          title: "解密失败",
+          description: "无法获取加密余额数据",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        const decrypted = await decryptBalance(
+          confidentialBalance as string,
+          token.contractAddress
+        );
+        setDecryptedBalance(decrypted);
+        setIsBalanceVisible(true);
+        toast({
+          title: "解密成功",
+          description: "余额已解密显示",
+        });
+      } catch (error) {
+        toast({
+          title: "解密失败",
+          description: decryptError || "解密过程中出现错误",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setIsBalanceVisible(!isBalanceVisible);
+    }
   };
 
   return (
@@ -81,7 +141,9 @@ export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
           <div className="flex items-center gap-3">
             <span className="text-2xl font-black text-foreground bg-gradient-primary bg-clip-text text-transparent">
               {isBalanceVisible 
-                ? `${token.balance.toLocaleString()} ${token.symbol}`
+                ? token.isBalanceEncrypted && decryptedBalance
+                  ? formatTokenBalance(decryptedBalance, token.decimals || 18, token.symbol, true) // 解密值是原始值，需要转换
+                  : formatTokenBalance(token.balance, token.decimals || 18, token.symbol, false) // ERC20余额已经转换过了
                 : '••••••••'
               }
             </span>
@@ -90,9 +152,12 @@ export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
                 variant="ghost"
                 size="sm"
                 onClick={toggleBalanceVisibility}
+                disabled={isDecrypting}
                 className="h-8 w-8 p-0 hover:bg-primary/10"
               >
-                {isBalanceVisible ? (
+                {isDecrypting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isBalanceVisible ? (
                   <EyeOff className="h-4 w-4" />
                 ) : (
                   <Eye className="h-4 w-4" />
