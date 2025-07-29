@@ -33,9 +33,26 @@ const Index = () => {
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
 
-  const handleConvertToken = async (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => {
+  const handleConvertToken = async (tokenId: string, amount: number, toType: 'erc20' | 'encrypted') => {    
     const sourceToken = tokens.find(t => t.id === tokenId);
-    if (!sourceToken || sourceToken.balance < amount) {
+    console.log("handleConvertToken:",amount,toType);
+    console.log("sourceToken:",sourceToken);
+    
+    if (!sourceToken) {
+      toast({
+        title: "错误",
+        description: "找不到代币信息",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // 获取实际余额：对于加密代币使用decryptedBalance，对于ERC20使用balance
+    const actualBalance = sourceToken.isBalanceEncrypted && sourceToken.decryptedBalance
+      ? Number(sourceToken.decryptedBalance) / Math.pow(10, sourceToken.decimals || 18)
+      : sourceToken.balance;
+    
+    if (actualBalance < amount) {
       toast({
         title: "错误",
         description: "代币余额不足",
