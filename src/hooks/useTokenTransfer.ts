@@ -110,7 +110,7 @@ export const useTokenTransfer = () => {
       console.log('✅ Zama SDK初始化成功');
       
       // Convert amount to proper units (assuming 18 decimals)
-      const amountInWei = parseEther(amount.toString());
+      const amountInWei = (amount*1000000);
       console.log('💰 转换金额:', { amount, amountInWei: amountInWei.toString() });
       
       // Create encrypted input buffer
@@ -120,7 +120,7 @@ export const useTokenTransfer = () => {
       const buffer = fhevmInstance.createEncryptedInput(tokenAddress, address);
       
       // Add the amount as uint64 (wei amount)
-      buffer.add64(BigInt(amountInWei.toString()));
+      buffer.add64(BigInt(amountInWei));
       console.log('📦 添加金额到缓冲区:', BigInt(amountInWei.toString()).toString());
       
       // Encrypt the values and get ciphertexts
@@ -128,13 +128,17 @@ export const useTokenTransfer = () => {
       // Allow UI update before the heavy encryption operation
       await new Promise(resolve => setTimeout(resolve, 0));
       const ciphertexts = await buffer.encrypt();
+
       console.log('✅ 加密完成:', {
         handles: ciphertexts.handles,
         inputProofLength: ciphertexts.inputProof.length,
         handleType: typeof ciphertexts.handles[0],
         handleValue: ciphertexts.handles[0],
+        handleIsArray: Array.isArray(ciphertexts.handles[0]),
+        handleIsUint8Array: ciphertexts.handles[0] instanceof Uint8Array,
         inputProofType: typeof ciphertexts.inputProof,
-        inputProofValue: ciphertexts.inputProof
+        inputProofIsArray: Array.isArray(ciphertexts.inputProof),
+        inputProofIsUint8Array: ciphertexts.inputProof instanceof Uint8Array
       });
       
       console.log('📝 设置转账状态为true');
@@ -142,17 +146,26 @@ export const useTokenTransfer = () => {
       
       // Convert handle to hex string if it's a Uint8Array
       const encryptedAmount = ciphertexts.handles[0];
-      let handleValue: string;
+      let handleValue: `0x${string}`;
       if (encryptedAmount instanceof Uint8Array) {
-        handleValue = '0x' + Array.from(encryptedAmount).map(b => b.toString(16).padStart(2, '0')).join('');
+        handleValue = ('0x' + Array.from(encryptedAmount).map(b => b.toString(16).padStart(2, '0')).join('')) as `0x${string}`;
       } else {
-        handleValue = encryptedAmount as string;
+        handleValue = encryptedAmount as `0x${string}`;
+      }
+      
+      // Convert inputProof to hex string if it's a Uint8Array
+      const inputProof = ciphertexts.inputProof;
+      let inputProofValue: `0x${string}`;
+      if (inputProof instanceof Uint8Array) {
+        inputProofValue = ('0x' + Array.from(inputProof).map(b => b.toString(16).padStart(2, '0')).join('')) as `0x${string}`;
+      } else {
+        inputProofValue = inputProof as `0x${string}`;
       }
       
       console.log('📞 准备调用confidentialTransfer:', {
         address: tokenAddress,
         functionName: 'confidentialTransfer',
-        args: [toAddress, handleValue, `inputProof(${ciphertexts.inputProof.length} bytes)`],
+        args: [toAddress, handleValue, inputProofValue],
         chain: sepolia.name,
         account: address,
       });
@@ -161,7 +174,7 @@ export const useTokenTransfer = () => {
         address: tokenAddress,
         abi: wrapperAbi,
         functionName: 'confidentialTransfer',
-        args: [toAddress, handleValue, ciphertexts.inputProof],
+        args: [toAddress, handleValue, inputProofValue],
         chain: sepolia,
         account: address,
       });

@@ -68,6 +68,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
 
   const toggleBalanceVisibility = async () => {
     if (token.isBalanceEncrypted) {
+      console.log("toggleBalanceVisibility confidentialBalance:",confidentialBalance);
+      
       if (!decryptedBalance) {
         // 需要先解密余额
         if (!confidentialBalance || !token.contractAddress) {
@@ -90,6 +92,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
             confidentialBalance as string,
             token.contractAddress
           );
+          console.log("decrypted:",decrypted);
+          
           setDecryptedBalance(decrypted);
           setIsBalanceVisible(true);
           
