@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +35,14 @@ interface TransferDialogProps {
 export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransferring = false, isEncrypting = false }: TransferDialogProps) => {
   const [toAddress, setToAddress] = useState("");
   const [amount, setAmount] = useState("");
+  const [localProcessing, setLocalProcessing] = useState(false);
   const { toast } = useToast();
+
+  // Debug logging for button states
+  useEffect(() => {
+    console.log('🔍 TransferDialog状态更新:', { isTransferring, isEncrypting, tokenType: token?.type });
+  }, [isTransferring, isEncrypting, token?.type]);
+
 
   if (!token) return null;
 
@@ -57,9 +64,13 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
   };
 
   const handleTransfer = async () => {
+    console.log('🚀 TransferDialog handleTransfer 被调用');
+    console.log('📝 当前表单数据:', { toAddress, amount, tokenId: token.id });
+    
     const transferAmount = parseFloat(amount);
     
     if (!toAddress || !toAddress.startsWith('0x') || toAddress.length !== 42) {
+      console.log('❌ 地址验证失败:', toAddress);
       toast({
         title: "错误",
         description: "请输入有效的以太坊地址",
@@ -86,15 +97,22 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
       return;
     }
 
+    // Set local processing state immediately for instant feedback
+    setLocalProcessing(true);
+    console.log('🔄 设置本地处理状态为true');
+
     try {
+      // Start the transfer process - this will trigger the button state change immediately
       await onTransfer(token.id, toAddress, transferAmount);
       
       // Only close dialog and clear fields on successful transfer
       setToAddress("");
       setAmount("");
+      setLocalProcessing(false);
       onOpenChange(false);
     } catch (error) {
       // Error handling is done in the parent component
+      setLocalProcessing(false);
       console.error('Transfer dialog error:', error);
     }
   };
@@ -169,10 +187,13 @@ export const TransferDialog = ({ open, onOpenChange, token, onTransfer, isTransf
               onClick={handleTransfer} 
               variant="glow" 
               className="flex-1"
-              disabled={isTransferring || isEncrypting}
+              disabled={isTransferring || isEncrypting || localProcessing}
             >
               <Send className="h-4 w-4 mr-2" />
-              {isEncrypting ? '加密中...' : isTransferring ? '转账中...' : '确认转账'}
+              {localProcessing ? (token.type === 'encrypted' ? '加密中...' : '转账中...') : 
+               isEncrypting ? '加密中...' : 
+               isTransferring ? '转账中...' : 
+               '确认转账'}
             </Button>
           </div>
         </div>

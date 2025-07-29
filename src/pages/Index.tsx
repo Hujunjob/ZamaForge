@@ -162,6 +162,8 @@ const Index = () => {
       if (sourceToken.type === 'encrypted') {
         // 加密代币转账 - 使用 confidentialTransfer
         console.log('🔐 开始加密代币转账流程');
+        
+        // Immediately show encrypting state
         toast({
           title: "正在转账",
           description: "正在加密转账金额，请稍候..."

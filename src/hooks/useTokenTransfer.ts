@@ -96,9 +96,13 @@ export const useTokenTransfer = () => {
       throw new Error('钱包未连接');
     }
     
+    // Set encrypting state immediately and synchronously
+    console.log('🔐 立即设置加密状态为true');
+    setState(prev => ({ ...prev, isEncrypting: true, error: null }));
+    
     try {
-      console.log('🔐 设置加密状态为true');
-      setState(prev => ({ ...prev, isEncrypting: true, error: null }));
+      // Allow React to update UI first by yielding to the event loop
+      await new Promise(resolve => setTimeout(resolve, 0));
       
       // Initialize Zama SDK
       console.log('🚀 初始化Zama SDK...');
@@ -111,6 +115,8 @@ export const useTokenTransfer = () => {
       
       // Create encrypted input buffer
       console.log('🛡️ 创建加密输入缓冲区...');
+      // Allow another UI update before heavy crypto operations
+      await new Promise(resolve => setTimeout(resolve, 0));
       const buffer = fhevmInstance.createEncryptedInput(tokenAddress, address);
       
       // Add the amount as uint64 (wei amount)
@@ -119,6 +125,8 @@ export const useTokenTransfer = () => {
       
       // Encrypt the values and get ciphertexts
       console.log('🔐 开始加密...');
+      // Allow UI update before the heavy encryption operation
+      await new Promise(resolve => setTimeout(resolve, 0));
       const ciphertexts = await buffer.encrypt();
       console.log('✅ 加密完成:', {
         handles: ciphertexts.handles,
@@ -132,10 +140,19 @@ export const useTokenTransfer = () => {
       console.log('📝 设置转账状态为true');
       setState(prev => ({ ...prev, isEncrypting: false, isTransferring: true }));
       
+      // Convert handle to hex string if it's a Uint8Array
+      const encryptedAmount = ciphertexts.handles[0];
+      let handleValue: string;
+      if (encryptedAmount instanceof Uint8Array) {
+        handleValue = '0x' + Array.from(encryptedAmount).map(b => b.toString(16).padStart(2, '0')).join('');
+      } else {
+        handleValue = encryptedAmount as string;
+      }
+      
       console.log('📞 准备调用confidentialTransfer:', {
         address: tokenAddress,
         functionName: 'confidentialTransfer',
-        args: [toAddress, ciphertexts.handles[0], `inputProof(${ciphertexts.inputProof.length} bytes)`],
+        args: [toAddress, handleValue, `inputProof(${ciphertexts.inputProof.length} bytes)`],
         chain: sepolia.name,
         account: address,
       });
@@ -144,7 +161,7 @@ export const useTokenTransfer = () => {
         address: tokenAddress,
         abi: wrapperAbi,
         functionName: 'confidentialTransfer',
-        args: [toAddress, ciphertexts.handles[0], ciphertexts.inputProof],
+        args: [toAddress, handleValue, ciphertexts.inputProof],
         chain: sepolia,
         account: address,
       });
