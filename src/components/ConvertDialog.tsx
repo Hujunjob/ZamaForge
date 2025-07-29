@@ -8,7 +8,7 @@ import { ArrowUpDown, Shield, Coins } from "lucide-react";
 import { Token } from "@/hooks/useTokens";
 import { useTranslation } from 'react-i18next';
 
-// 格式化代币余额显示
+// Format token balance display
 const formatTokenBalance = (balance: string | number, decimals: number = 18, symbol: string, isRawValue: boolean = false) => {
   const balanceNum = typeof balance === 'string' ? Number(balance) : balance;
   
@@ -42,7 +42,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
 
   const targetType = token.type === 'erc20' ? 'encrypted' : 'erc20';
   
-  // 获取显示余额：如果是加密代币且已解密，显示解密后的余额
+  // Get display balance: if encrypted token and decrypted, show decrypted balance
   const getDisplayBalance = () => {
     if (token.isBalanceEncrypted && token.decryptedBalance) {
       return formatTokenBalance(token.decryptedBalance, token.decimals || 18, token.symbol, true);
@@ -50,7 +50,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
     return formatTokenBalance(token.balance, token.decimals || 18, token.symbol, false);
   };
   
-  // 获取实际可用余额数值
+  // Get actual available balance value
   const getActualBalance = () => {
     if (token.isBalanceEncrypted && token.decryptedBalance) {
       const divisor = Math.pow(10, token.decimals || 18);
@@ -87,7 +87,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
       setAmount("");
       onOpenChange(false);
     } catch (error) {
-      // 错误处理已在父组件中完成
+      // Error handling is done in parent component
     } finally {
       setIsConverting(false);
     }

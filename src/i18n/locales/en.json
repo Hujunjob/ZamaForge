@@ -50,17 +50,23 @@
     "transfer": "Transfer",
     "erc20Badge": "ERC20",
     "encryptedBadge": "Encrypted",
-    "encryptedSuffix": " (Encrypted)"
+    "encryptedSuffix": " (Encrypted)",
+    "decrypting": "Decrypting Balance",
+    "decryptingDescription": "Decrypting encrypted token balance, please wait...",
+    "decryptSuccess": "Balance Decrypted",
+    "decryptSuccessDescription": "Token balance successfully decrypted and displayed",
+    "decryptError": "Decryption Failed",
+    "decryptErrorDescription": "Unable to decrypt balance data"
   },
   "createToken": {
-    "title": "Create Token",
-    "button": "Create New Token",
+    "title": "Claim Offcial test coin $ZamaForge",
+    "button": "Claim $Z",
     "form": {
       "tokenName": "Token Name",
       "tokenSymbol": "Token Symbol",
       "initialSupply": "Initial Supply",
       "cancel": "Cancel",
-      "create": "Create Token"
+      "create": "Claim Offcial test coin $ZamaForge"
     },
     "messages": {
       "creating": "Creating token, please confirm transaction...",
@@ -111,7 +117,8 @@
       "success": "Transfer successful",
       "encryptedTransferSuccess": "Successfully transferred {{amount}} {{symbol}} (encrypted) to {{address}}",
       "erc20TransferSuccess": "Successfully transferred {{amount}} {{symbol}} to {{address}}",
-      "failed": "Transfer failed"
+      "failed": "Transfer failed",
+      "insufficientBalance": "Insufficient token balance"
     }
   },
   "common": {

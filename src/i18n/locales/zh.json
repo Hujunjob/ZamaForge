@@ -50,17 +50,23 @@
     "transfer": "转账",
     "erc20Badge": "ERC20",
     "encryptedBadge": "加密",
-    "encryptedSuffix": " (加密)"
+    "encryptedSuffix": " (加密)",
+    "decrypting": "正在解密余额",
+    "decryptingDescription": "正在解密加密代币余额，请稍候...",
+    "decryptSuccess": "余额解密完成",
+    "decryptSuccessDescription": "代币余额已成功解密并显示",
+    "decryptError": "解密失败",
+    "decryptErrorDescription": "无法解密余额数据"
   },
   "createToken": {
-    "title": "创建代币",
-    "button": "创建新代币",
+    "title": "Claim Offcial test coin $ZamaForge",
+    "button": "Claim $Z",
     "form": {
       "tokenName": "代币名称",
       "tokenSymbol": "代币符号",
       "initialSupply": "初始供应量",
       "cancel": "取消",
-      "create": "创建代币"
+      "create": "Claim Offcial test coin $ZamaForge"
     },
     "messages": {
       "creating": "正在创建代币，请确认交易...",
@@ -111,7 +117,8 @@
       "success": "转账成功",
       "encryptedTransferSuccess": "已向 {{address}} 转账 {{amount}} {{symbol}}（加密）",
       "erc20TransferSuccess": "已向 {{address}} 转账 {{amount}} {{symbol}}",
-      "failed": "转账失败"
+      "failed": "转账失败",
+      "insufficientBalance": "代币余额不足"
     }
   },
   "common": {

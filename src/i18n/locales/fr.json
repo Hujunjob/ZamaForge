@@ -50,17 +50,23 @@
     "transfer": "Transférer",
     "erc20Badge": "ERC20",
     "encryptedBadge": "Chiffré",
-    "encryptedSuffix": " (Chiffré)"
+    "encryptedSuffix": " (Chiffré)",
+    "decrypting": "Déchiffrement du Solde",
+    "decryptingDescription": "Déchiffrement du solde du jeton chiffré, veuillez patienter...",
+    "decryptSuccess": "Solde Déchiffré",
+    "decryptSuccessDescription": "Solde du jeton déchiffré avec succès et affiché",
+    "decryptError": "Échec du Déchiffrement",
+    "decryptErrorDescription": "Impossible de déchiffrer les données de solde"
   },
   "createToken": {
-    "title": "Créer un Jeton",
-    "button": "Créer un Nouveau Jeton",
+    "title": "Claim Offcial test coin $ZamaForge",
+    "button": "Claim $Z",
     "form": {
       "tokenName": "Nom du Jeton",
       "tokenSymbol": "Symbole du Jeton",
       "initialSupply": "Approvisionnement Initial",
       "cancel": "Annuler",
-      "create": "Créer le Jeton"
+      "create": "Claim Offcial test coin $ZamaForge"
     },
     "messages": {
       "creating": "Création du jeton, veuillez confirmer la transaction...",

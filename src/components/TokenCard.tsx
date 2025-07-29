@@ -85,8 +85,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
 
         // 显示解密中提示
         toast({
-          title: t('common.loading'),
-          description: t('common.loading'),
+          title: t('tokenCard.decrypting'),
+          description: t('tokenCard.decryptingDescription'),
         });
 
         try {
@@ -107,8 +107,8 @@ export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: Token
           // 只有成功解密且不是零值时才显示成功提示
           if (decrypted !== '0') {
             toast({
-              title: t('common.success'),
-              description: t('common.success'),
+              title: t('tokenCard.decryptSuccess'),
+              description: t('tokenCard.decryptSuccessDescription'),
             });
           }
         } catch (error) {
