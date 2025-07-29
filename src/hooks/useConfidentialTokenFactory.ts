@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useConfig } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
-import { readContract } from '@wagmi/core';
+import { readContract } from 'wagmi/actions';
 import { sepolia } from 'wagmi/chains';
 import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.json';
 import ConfidentialTokenWrapperABI from '../../abis/ConfidentialTokenWrapper.json';
