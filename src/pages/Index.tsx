@@ -11,12 +11,20 @@ import { Shield, Coins, ArrowLeftRight, Sparkles, Zap, Lock, Trash2 } from "luci
 import { useTokens, Token } from "@/hooks/useTokens";
 import { useToast } from "@/hooks/use-toast";
 import { useConfidentialTokenFactory } from "@/hooks/useConfidentialTokenFactory";
+import { readContract } from '@wagmi/core';
+import { useConfig } from 'wagmi';
+import ConfidentialTokenFactoryABI from '../../abis/ConfidentialTokenFactory.json';
 import heroImage from "@/assets/hero-blockchain.jpg";
 
 const Index = () => {
   const { tokens, addToken, updateToken, clearAllTokens, erc20Tokens, encryptedTokens } = useTokens();
   const { toast } = useToast();
   const { wrapERC20, isPending: isWrapping, isConfirmed, error: wrapError } = useConfidentialTokenFactory();
+  const config = useConfig();
+  
+  // ConfidentialTokenFactory合约地址
+  const FACTORY_CONTRACT_ADDRESS = '0x8d3F4e8fe379dBEA133420Eb6Be79033A0e78593' as const;
+  const factoryAbi = ConfidentialTokenFactoryABI as any;
 
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [convertDialogOpen, setConvertDialogOpen] = useState(false);
@@ -53,10 +61,44 @@ const Index = () => {
 
         await wrapERC20(sourceToken.contractAddress, amount);
         
+        // 获取真实的加密代币合约地址
+        const confidentialTokenAddress = await readContract(config, {
+          address: FACTORY_CONTRACT_ADDRESS,
+          abi: factoryAbi,
+          functionName: 'getConfidentialToken',
+          args: [sourceToken.contractAddress],
+        }) as `0x${string}`;
+        
         toast({
           title: "转换成功",
           description: `已将 ${amount} ${sourceToken.symbol} 转换为加密代币`
         });
+
+        // 更新本地状态
+        updateToken(tokenId, { balance: sourceToken.balance - amount });
+
+        // 查找是否已存在目标类型的同名代币
+        const existingTargetToken = tokens.find(t => 
+          t.name === sourceToken.name && 
+          t.symbol === sourceToken.symbol && 
+          t.type === toType
+        );
+
+        if (existingTargetToken) {
+          updateToken(existingTargetToken.id, { 
+            balance: existingTargetToken.balance + amount 
+          });
+        } else {
+          // 创建新的加密代币，使用真实的合约地址
+          addToken({
+            name: sourceToken.name,
+            symbol: sourceToken.symbol,
+            balance: amount,
+            type: toType,
+            contractAddress: confidentialTokenAddress,
+            isBalanceEncrypted: toType === 'encrypted'
+          });
+        }
 
       } else if (sourceToken.type === 'encrypted' && toType === 'erc20') {
         // 加密代币转换为ERC20：调用 unwrap (需要实现)
@@ -66,32 +108,6 @@ const Index = () => {
           variant: "destructive"
         });
         return;
-      }
-
-      // 更新本地状态（这里应该监听合约事件来更新，暂时保留简单实现）
-      updateToken(tokenId, { balance: sourceToken.balance - amount });
-
-      // 查找是否已存在目标类型的同名代币
-      const existingTargetToken = tokens.find(t => 
-        t.name === sourceToken.name && 
-        t.symbol === sourceToken.symbol && 
-        t.type === toType
-      );
-
-      if (existingTargetToken) {
-        updateToken(existingTargetToken.id, { 
-          balance: existingTargetToken.balance + amount 
-        });
-      } else {
-        // 创建新的目标类型代币
-        addToken({
-          name: sourceToken.name,
-          symbol: sourceToken.symbol,
-          balance: amount,
-          type: toType,
-          contractAddress: toType === 'encrypted' ? `0x${Math.random().toString(16).slice(2, 42)}` : sourceToken.contractAddress,
-          isBalanceEncrypted: toType === 'encrypted'
-        });
       }
 
     } catch (error) {
