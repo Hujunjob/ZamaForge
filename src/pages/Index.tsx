@@ -318,6 +318,7 @@ const Index = () => {
                     token={token} 
                     onConvert={handleTokenConvert}
                     onTransfer={handleTokenTransfer}
+                    onUpdateToken={updateToken}
                   />
                 ))}
               </div>
@@ -331,6 +332,7 @@ const Index = () => {
                     token={token} 
                     onConvert={handleTokenConvert}
                     onTransfer={handleTokenTransfer}
+                    onUpdateToken={updateToken}
                   />
                 ))}
               </div>
@@ -350,6 +352,7 @@ const Index = () => {
                     token={token} 
                     onConvert={handleTokenConvert}
                     onTransfer={handleTokenTransfer}
+                    onUpdateToken={updateToken}
                   />
                 ))}
               </div>

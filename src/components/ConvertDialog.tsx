@@ -7,6 +7,22 @@ import { useToast } from "@/components/ui/use-toast";
 import { ArrowUpDown, Shield, Coins } from "lucide-react";
 import { Token } from "@/hooks/useTokens";
 
+// 格式化代币余额显示
+const formatTokenBalance = (balance: string | number, decimals: number = 18, symbol: string, isRawValue: boolean = false) => {
+  const balanceNum = typeof balance === 'string' ? Number(balance) : balance;
+  
+  let actualBalance = balanceNum;
+  
+  if (isRawValue) {
+    const divisor = Math.pow(10, decimals);
+    actualBalance = balanceNum / divisor;
+  }
+  
+  const formattedBalance = actualBalance.toFixed(decimals <= 6 ? decimals : 6);
+  const cleanedBalance = parseFloat(formattedBalance).toString();
+  return `${parseFloat(cleanedBalance).toLocaleString()} ${symbol}`;
+};
+
 interface ConvertDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -23,6 +39,23 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
   if (!token) return null;
 
   const targetType = token.type === 'erc20' ? 'encrypted' : 'erc20';
+  
+  // 获取显示余额：如果是加密代币且已解密，显示解密后的余额
+  const getDisplayBalance = () => {
+    if (token.isBalanceEncrypted && token.decryptedBalance) {
+      return formatTokenBalance(token.decryptedBalance, token.decimals || 18, token.symbol, true);
+    }
+    return formatTokenBalance(token.balance, token.decimals || 18, token.symbol, false);
+  };
+  
+  // 获取实际可用余额数值
+  const getActualBalance = () => {
+    if (token.isBalanceEncrypted && token.decryptedBalance) {
+      const divisor = Math.pow(10, token.decimals || 18);
+      return Number(token.decryptedBalance) / divisor;
+    }
+    return token.balance;
+  };
 
   const handleConvert = async () => {
     const convertAmount = parseFloat(amount);
@@ -36,7 +69,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
       return;
     }
 
-    if (convertAmount > token.balance) {
+    if (convertAmount > getActualBalance()) {
       toast({
         title: "错误", 
         description: "转换数量不能超过余额",
@@ -80,7 +113,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
               }
               <div>
                 <p className="font-medium">{token.name}</p>
-                <p className="text-sm text-muted-foreground">当前余额: {token.balance.toLocaleString()} {token.symbol}</p>
+                <p className="text-sm text-muted-foreground">当前余额: {getDisplayBalance()}</p>
               </div>
             </div>
           </div>
@@ -110,7 +143,7 @@ export const ConvertDialog = ({ open, onOpenChange, token, onConvert, isLoading 
               placeholder={`输入要转换的 ${token.symbol} 数量`}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              max={token.balance}
+              max={getActualBalance()}
             />
           </div>
 

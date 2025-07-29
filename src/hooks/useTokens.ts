@@ -12,6 +12,7 @@ export interface Token {
   contractAddress?: string;
   isBalanceEncrypted?: boolean;
   decimals?: number; // 代币小数位数，默认18
+  decryptedBalance?: string; // 已解密的余额（原始值）
 }
 
 const STORAGE_KEY = 'zamaforge_tokens';

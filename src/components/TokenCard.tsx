@@ -32,11 +32,16 @@ interface TokenCardProps {
   token: Token;
   onConvert: (token: Token) => void;
   onTransfer?: (token: Token) => void;
+  onUpdateToken?: (tokenId: string, updates: Partial<Token>) => void;
 }
 
-export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
-  const [isBalanceVisible, setIsBalanceVisible] = useState(!token.isBalanceEncrypted);
-  const [decryptedBalance, setDecryptedBalance] = useState<string | null>(null);
+export const TokenCard = ({ token, onConvert, onTransfer, onUpdateToken }: TokenCardProps) => {
+  const [isBalanceVisible, setIsBalanceVisible] = useState(
+    !token.isBalanceEncrypted || !!token.decryptedBalance
+  );
+  const [decryptedBalance, setDecryptedBalance] = useState<string | null>(
+    token.decryptedBalance || null
+  );
   const { toast } = useToast();
   const { decryptBalance, isDecrypting, error: decryptError } = useZamaDecryption();
   
@@ -62,36 +67,54 @@ export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
   };
 
   const toggleBalanceVisibility = async () => {
-    if (token.isBalanceEncrypted && !isBalanceVisible && !decryptedBalance) {
-      // Need to decrypt the balance first
-      if (!confidentialBalance || !token.contractAddress) {
-        toast({
-          title: "解密失败",
-          description: "无法获取加密余额数据",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (token.isBalanceEncrypted) {
+      if (!decryptedBalance) {
+        // 需要先解密余额
+        if (!confidentialBalance || !token.contractAddress) {
+          toast({
+            title: "解密失败",
+            description: "无法获取加密余额数据",
+            variant: "destructive",
+          });
+          return;
+        }
 
-      try {
-        const decrypted = await decryptBalance(
-          confidentialBalance as string,
-          token.contractAddress
-        );
-        setDecryptedBalance(decrypted);
-        setIsBalanceVisible(true);
+        // 显示解密中提示
         toast({
-          title: "解密成功",
-          description: "余额已解密显示",
+          title: "解密中...",
+          description: "正在解密代币余额，请稍候",
         });
-      } catch (error) {
-        toast({
-          title: "解密失败",
-          description: decryptError || "解密过程中出现错误",
-          variant: "destructive",
-        });
+
+        try {
+          const decrypted = await decryptBalance(
+            confidentialBalance as string,
+            token.contractAddress
+          );
+          setDecryptedBalance(decrypted);
+          setIsBalanceVisible(true);
+          
+          // 更新token状态，保存解密后的余额
+          if (onUpdateToken) {
+            onUpdateToken(token.id, { decryptedBalance: decrypted });
+          }
+          
+          toast({
+            title: "解密成功",
+            description: "余额已解密显示",
+          });
+        } catch (error) {
+          toast({
+            title: "解密失败",
+            description: decryptError || "解密过程中出现错误",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // 已解密，切换显示/隐藏
+        setIsBalanceVisible(!isBalanceVisible);
       }
     } else {
+      // 普通ERC20代币，直接切换显示/隐藏
       setIsBalanceVisible(!isBalanceVisible);
     }
   };
@@ -140,12 +163,24 @@ export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
           <span className="text-base text-foreground/70 font-medium">余额</span>
           <div className="flex items-center gap-3">
             <span className="text-2xl font-black text-foreground bg-gradient-primary bg-clip-text text-transparent">
-              {isBalanceVisible 
-                ? token.isBalanceEncrypted && decryptedBalance
-                  ? formatTokenBalance(decryptedBalance, token.decimals || 18, token.symbol, true) // 解密值是原始值，需要转换
-                  : formatTokenBalance(token.balance, token.decimals || 18, token.symbol, false) // ERC20余额已经转换过了
-                : '••••••••'
-              }
+              {token.isBalanceEncrypted ? (
+                // 加密代币逻辑
+                decryptedBalance ? (
+                  // 已解密，显示解密后的余额
+                  formatTokenBalance(decryptedBalance, token.decimals || 18, token.symbol, true)
+                ) : isBalanceVisible ? (
+                  // 正在解密中，显示loading或隐藏状态
+                  isDecrypting ? '解密中...' : '••••••••'
+                ) : (
+                  // 未解密，显示隐藏状态
+                  '••••••••'
+                )
+              ) : (
+                // 普通ERC20代币逻辑
+                isBalanceVisible 
+                  ? formatTokenBalance(token.balance, token.decimals || 18, token.symbol, false)
+                  : '••••••••'
+              )}
             </span>
             {token.isBalanceEncrypted && (
               <Button
@@ -157,9 +192,11 @@ export const TokenCard = ({ token, onConvert, onTransfer }: TokenCardProps) => {
               >
                 {isDecrypting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
-                ) : isBalanceVisible ? (
+                ) : decryptedBalance ? (
+                  // 已解密，显示隐藏图标（因为余额已显示）
                   <EyeOff className="h-4 w-4" />
                 ) : (
+                  // 未解密，显示显示图标
                   <Eye className="h-4 w-4" />
                 )}
               </Button>

@@ -41,7 +41,7 @@ export const CreateTokenDialog = () => {
         ) : (
           <>
             <Gift className="mr-3 h-6 w-6" />
-            Claim $FORGE
+            Claim $Z
           </>
         )}
       </Button>
